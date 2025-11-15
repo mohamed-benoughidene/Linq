@@ -34,8 +34,9 @@ export function SignupForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
- const router = useRouter()
-  const supabase = createClient()
+ const router = useRouter();
+  const supabase = createClient();
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
 
   async function handleSignup(Userdata: SignupFormData) {
     console.log("calling handleSignup");
@@ -43,21 +44,41 @@ export function SignupForm({
     setErrorMessage(null)
     setMessage(null)
     setLoading(true)
+    setRetryAfter(null);
+      try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: Userdata.email,
+          password: Userdata.password,
+        }),
+      });
 
-     const { data, error } = await supabase.auth.signUp({
-      email: Userdata.email,
-      password: Userdata.password, 
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-console.log("Signup response:", { data, error });
-    if (error) {
-      setErrorMessage(error.message)
-      setLoading(false)
-    } else if (data.user) {
-      setMessage('Check your email for the confirmation link!')
-      setLoading(false)
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle rate limit error
+        if (response.status === 429) {
+          setErrorMessage(data.error);
+          setRetryAfter(data.retryAfter);
+        } else {
+          setErrorMessage(data.error || 'Signup failed');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Success - show message
+      setMessage(data.message);
+      setLoading(false);
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
+      setLoading(false);
     }
   }
   return (
