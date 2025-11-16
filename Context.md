@@ -11,6 +11,7 @@ Key points:
 - UI: shadcn + Tailwind CSS
 - Auth & DB: Supabase (Postgres + Auth + RLS)
 - **Security: Rate limiting with Upstash Redis**
+- **OAuth: Google authentication**
 
 ## Quick start (local)
 
@@ -45,6 +46,9 @@ At minimum add these to `.env.local`:
 - `UPSTASH_REDIS_REST_URL`=https://your-redis.upstash.io
 - `UPSTASH_REDIS_REST_TOKEN`=your-upstash-token
 
+### App Configuration (Required for OAuth)
+- `NEXT_PUBLIC_SITE_URL`=http://localhost:3000
+
 **Important:** Keep secret keys out of the client and do not commit `.env.local`.
 
 ## Folder layout (important parts)
@@ -61,10 +65,15 @@ src/
       protected/
       auth/
         signup/
-          route.ts      — ⭐ NEW: Secure signup API with rate limiting
+          route.ts      — ⭐ Secure signup API with rate limiting
 
     auth/
       confirm/          — auth confirm route
+      callback/
+        route.ts        — ⭐ NEW: OAuth callback handler
+
+    actions/
+      auth.ts           — ⭐ NEW: Server actions for Google OAuth
 
     dashboard/          — protected dashboard page
     forgot-password/    — forgot-password page
@@ -75,14 +84,14 @@ src/
     ui/                 — presentational components (shadcn-derived)
       navbar1.tsx
       hero1.tsx          — hero component (may require props; see below)
-      login-form.tsx     — typed react-hook-form component
-      signup-form.tsx    — ⭐ UPDATED: Uses API route for secure signup
+      login-form.tsx     — ⭐ UPDATED: Supports Google OAuth
+      signup-form.tsx    — ⭐ UPDATED: Supports Google OAuth
       forgotPasswordForm.tsx
       ...other components
 
   lib/
     utils.ts            — shared helpers
-    rate-limit.ts       — ⭐ NEW: Rate limiting configuration with Upstash
+    rate-limit.ts       — ⭐ Rate limiting configuration with Upstash
 
   utils/supabase/
     client.ts           — supabase client factory (use client for browser)
@@ -91,6 +100,34 @@ src/
 ```
 
 Top-level files: `middleware.ts`, `next.config.ts`, `package.json`, `tsconfig.json`.
+
+## Google OAuth Setup
+
+### Files Added:
+1. **`src/app/auth/callback/route.ts`** - Handles OAuth callback from Google
+2. **`src/app/actions/auth.ts`** - Server action for `signInWithGoogle()`
+
+### Configuration Required:
+
+**Google Cloud Console:**
+1. Create OAuth 2.0 credentials
+2. Authorized redirect URI: Get from Supabase Dashboard → Authentication → Providers → Google
+3. Add scopes: `userinfo.email`, `userinfo.profile`, `openid`
+
+**Supabase Dashboard:**
+1. Enable Google provider in Authentication → Providers
+2. Add Google Client ID and Secret
+3. Copy callback URL for Google Cloud setup
+
+**Environment Variable:**
+```
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### Production Deployment:
+- Add production URL to Google Cloud Console authorized URIs
+- Update `NEXT_PUBLIC_SITE_URL` in production environment
+- Update Supabase Site URL and Redirect URLs in dashboard
 
 ## Security Features
 
@@ -166,19 +203,24 @@ return NextResponse.json({
 | New user | "Check your email..." | ✓ Supabase confirmation |
 | Existing user | "Check your email..." | ✗ No email (silent) |
 | Rate limited | Error + countdown timer | ✗ Blocked |
+| Google OAuth | Instant login/signup | ✗ Auto-verified |
 
 ## How auth & protected pages work
 
 - The project uses Supabase Auth (client in browser + server helpers in `utils/supabase`).
-- **Signup flow now uses API route** (`/api/auth/signup`) instead of direct Supabase client calls.
+- **Two authentication methods:**
+  1. Email/Password: Signup uses API route (`/api/auth/signup`), login uses client
+  2. Google OAuth: Uses server action (`signInWithGoogle`) and callback route
 - Protected API routes live under `src/app/api/protected/route.ts` and similar.
 - Session refresh / Host-based routing logic can be found in the root `middleware.ts` and `src/utils/supabase/middleware.ts`.
 
 ## Common gotchas & tips
 
 - **Rate limit testing:** After 5 rapid signup attempts, you'll be blocked for 60 seconds. Wait or adjust the limit in `rate-limit.ts` for testing.
-- **Environment variables:** Both Supabase AND Upstash Redis variables are required or signup will fail.
+- **Environment variables:** Supabase, Upstash Redis, AND `NEXT_PUBLIC_SITE_URL` are required.
 - **API route location:** The signup API must be at `src/app/api/auth/signup/route.ts` (note the `api` folder) or you'll get JSON parse errors.
+- **OAuth callback:** Must be at `src/app/auth/callback/route.ts` (note: `auth`, not `api/auth`).
+- **Google OAuth redirect:** For hosted Supabase use `http://localhost:3000/auth/callback`, for local Docker use `http://localhost:54321/auth/v1/callback`.
 - Hero component props: `src/components/ui/hero1.tsx` expects props (`heading`, `description`, `image`) — either pass them from `app/page.tsx` or set defaults inside `hero1.tsx` to avoid TypeScript errors.
 - React Hook Form typing: ensure you call `useForm<YourFormType>()` so `handleSubmit` returns a typed object. Example: `useForm<LoginFormData>()`.
 - Type shorthand errors: when passing values to API calls, reference the fields off the function parameter (e.g. `email: data.email`) rather than using bare `email` unless it exists in scope.
@@ -195,6 +237,7 @@ return NextResponse.json({
 - Use `app/layout.tsx` to attach any global providers (theme, auth provider, supabase provider).
 - Keep presentational components inside `components/ui` and small, focused.
 - **New API routes** should follow the pattern in `api/auth/signup/route.ts` (rate limiting + validation + security).
+- **Server actions** for auth should be in `app/actions/auth.ts` with `'use server'` directive.
 
 ## Where to change layout / navbar centering
 
@@ -229,11 +272,15 @@ RLS should be configured so users only access their own rows.
 - Always use the API route for signup (`/api/auth/signup`)
 - Keep the same success message for new and existing users
 - Validate inputs server-side
+- Use server actions for OAuth flows
+- Verify callback URLs match in Google Cloud Console
 
 ❌ **Don't:**
 - Reveal whether an email exists in the system
 - Handle signup logic in client components
 - Skip rate limiting for "convenience"
+- Commit OAuth credentials to git
+- Mix up hosted vs local Supabase callback URLs
 
 ## Deployment Checklist
 
@@ -244,6 +291,7 @@ When deploying to production (Vercel):
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
    - `UPSTASH_REDIS_REST_URL`
    - `UPSTASH_REDIS_REST_TOKEN`
+   - `NEXT_PUBLIC_SITE_URL` (set to production URL)
 
 2. ✅ Verify rate limiting works:
    - Test signup 6+ times rapidly
@@ -256,6 +304,15 @@ When deploying to production (Vercel):
 4. ✅ Enable email confirmations in Supabase:
    - Dashboard → Authentication → Email Templates
    - Ensure confirmation emails are enabled
+
+5. ✅ Add production URLs to Google Cloud Console:
+   - Authorized JavaScript origins: `https://yourdomain.com`
+   - Authorized redirect URIs: Get from Supabase Dashboard
+
+6. ✅ Update Supabase URL Configuration:
+   - Dashboard → Authentication → URL Configuration
+   - Site URL: `https://yourdomain.com`
+   - Redirect URLs: Add `https://yourdomain.com/**`
 
 ## Troubleshooting
 
@@ -275,11 +332,25 @@ When deploying to production (Vercel):
 **Cause:** Email confirmations disabled in Supabase  
 **Fix:** Supabase Dashboard → Authentication → Settings → Enable confirmations
 
+### "Redirect URI mismatch" error (OAuth)
+**Cause:** Callback URL in Google Cloud doesn't match Supabase  
+**Fix:** Copy exact URL from Supabase Dashboard → Authentication → Providers → Google
+
+### Google button does nothing
+**Cause:** Server action not found or NEXT_PUBLIC_SITE_URL missing  
+**Fix:** Verify `src/app/actions/auth.ts` exists and check `.env.local`
+
+### OAuth redirects but user not logged in
+**Cause:** Callback route not handling code exchange  
+**Fix:** Check `src/app/auth/callback/route.ts` exists and logs
+
 ## Next steps / TODO ideas
 
 - ✅ ~~Implement secure signup with rate limiting~~ (DONE)
+- ✅ ~~Add Google OAuth for login and signup~~ (DONE)
 - Add rate limiting to login endpoint
 - Add rate limiting to password reset
+- Add Apple OAuth
 - Finish block editor & drag-n-drop persistence
 - Harden domain verification; add background verification checks
 - Add tests for key server actions and API routes
@@ -289,9 +360,10 @@ When deploying to production (Vercel):
 ---
 
 **Recent Updates:**
+- Added Google OAuth authentication (login + signup)
+- Created OAuth callback handler and server action
+- Updated login/signup forms with OAuth support
 - Added rate limiting with Upstash Redis (5 attempts/60s)
 - Implemented secure signup API route (no user enumeration)
-- Updated signup form to use server-side validation
-- Added comprehensive security documentation
 
 ---
