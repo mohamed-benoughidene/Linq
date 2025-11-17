@@ -350,7 +350,6 @@ When deploying to production (Vercel):
 - ✅ ~~Add Google OAuth for login and signup~~ (DONE)
 - Add rate limiting to login endpoint
 - Add rate limiting to password reset
-- Add Apple OAuth
 - Finish block editor & drag-n-drop persistence
 - Harden domain verification; add background verification checks
 - Add tests for key server actions and API routes
