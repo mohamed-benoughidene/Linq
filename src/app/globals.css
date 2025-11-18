@@ -41,6 +41,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Custom animations */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-shake: shake 0.5s ease-in-out;
 }
 
 :root {
@@ -120,9 +124,33 @@
     @apply bg-background text-foreground;
   }
 }
-.container{
 
+.container {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Custom Keyframe Animations */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-8px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(8px);
+  }
 }
