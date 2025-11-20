@@ -95,7 +95,7 @@ export function PropertiesPanel() {
 
             {/* Style Controls */}
             <div className="space-y-4">
-                <h3 className="font-medium text-sm">Styles</h3>
+                <h3 className="font-medium text-sm">Typography</h3>
 
                 <div className="space-y-2">
                     <Label htmlFor="fontSize">Font Size (px)</Label>
@@ -108,6 +108,46 @@ export function PropertiesPanel() {
                         max={96}
                     />
                 </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="fontFamily">Font Family</Label>
+                    <select
+                        id="fontFamily"
+                        value={selectedBlock.styles.fontFamily || 'Inter'}
+                        onChange={(e) => handleStyleChange('fontFamily', e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                        <option value="Inter">Inter</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="fontWeight">Font Weight</Label>
+                    <select
+                        id="fontWeight"
+                        value={selectedBlock.styles.fontWeight || 400}
+                        onChange={(e) => handleStyleChange('fontWeight', parseInt(e.target.value))}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                        <option value={300}>Light (300)</option>
+                        <option value={400}>Normal (400)</option>
+                        <option value={500}>Medium (500)</option>
+                        <option value={600}>Semibold (600)</option>
+                        <option value={700}>Bold (700)</option>
+                        <option value={800}>Extrabold (800)</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Color Controls */}
+            <div className="space-y-4">
+                <h3 className="font-medium text-sm">Colors</h3>
 
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
