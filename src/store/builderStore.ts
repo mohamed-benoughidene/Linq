@@ -13,6 +13,8 @@ interface BuilderStore {
     selectBlock: (id: string | null) => void
     moveBlockUp: (id: string) => void
     moveBlockDown: (id: string) => void
+    updateGlobalTheme: (theme: GlobalTheme) => void
+    applyGlobalTheme: (theme: GlobalTheme) => void
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -65,7 +67,26 @@ export const useBuilderStore = create<BuilderStore>()(
                 const newBlocks = [...state.blocks]
                     ;[newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]]
                 return { blocks: newBlocks }
-            })
+            }),
+
+            updateGlobalTheme: (theme: GlobalTheme) => set({ globalTheme: theme }),
+
+            applyGlobalTheme: (theme: GlobalTheme) => set((state) => ({
+                globalTheme: theme,
+                blocks: state.blocks.map(block => {
+                    if (block.themeLocked) return block
+                    return {
+                        ...block,
+                        styles: {
+                            ...block.styles,
+                            color: theme.colors.text,
+                            backgroundColor: 'transparent',
+                            fontFamily: theme.typography.font,
+                            fontSize: block.type === 'heading' ? theme.typography.headingSize : theme.typography.bodySize
+                        }
+                    }
+                })
+            }))
         }),
         {
             name: 'linq-builder-storage',
