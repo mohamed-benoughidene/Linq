@@ -5,6 +5,11 @@ interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
     globalTheme: GlobalTheme
+
+    addBlock: (block: Block) => void
+    updateBlock: (id: string, updates: Partial<Block>) => void
+    deleteBlock: (id: string) => void
+    selectBlock: (id: string | null) => void
 }
 
 export const useBuilderStore = create<BuilderStore>((set) => ({
@@ -23,5 +28,21 @@ export const useBuilderStore = create<BuilderStore>((set) => ({
             headingSize: 32,
             bodySize: 16
         }
-    }
+    },
+
+    addBlock: (block: Block) => set((state) => ({
+        blocks: [...state.blocks, block]
+    })),
+
+    updateBlock: (id: string, updates: Partial<Block>) => set((state) => ({
+        blocks: state.blocks.map(block =>
+            block.id === id ? { ...block, ...updates } : block
+        )
+    })),
+
+    deleteBlock: (id: string) => set((state) => ({
+        blocks: state.blocks.filter(block => block.id !== id)
+    })),
+
+    selectBlock: (id: string | null) => set({ selectedBlockId: id })
 }))
