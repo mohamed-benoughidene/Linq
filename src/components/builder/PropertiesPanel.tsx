@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 
 export function PropertiesPanel() {
     const selectedBlockId = useBuilderStore((state) => state.selectedBlockId)
@@ -13,6 +13,8 @@ export function PropertiesPanel() {
     const updateBlock = useBuilderStore((state) => state.updateBlock)
     const deleteBlock = useBuilderStore((state) => state.deleteBlock)
     const selectBlock = useBuilderStore((state) => state.selectBlock)
+    const moveBlockUp = useBuilderStore((state) => state.moveBlockUp)
+    const moveBlockDown = useBuilderStore((state) => state.moveBlockDown)
 
     const selectedBlock = blocks.find(b => b.id === selectedBlockId)
 
@@ -44,6 +46,30 @@ export function PropertiesPanel() {
                 <p className="text-sm text-muted-foreground mb-4">
                     Editing {selectedBlock.type} block
                 </p>
+            </div>
+
+            {/* Reorder Buttons */}
+            <div className="flex gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => moveBlockUp(selectedBlock.id)}
+                    disabled={blocks.findIndex(b => b.id === selectedBlock.id) === 0}
+                >
+                    <ArrowUp className="h-4 w-4 mr-2" />
+                    Move Up
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => moveBlockDown(selectedBlock.id)}
+                    disabled={blocks.findIndex(b => b.id === selectedBlock.id) === blocks.length - 1}
+                >
+                    <ArrowDown className="h-4 w-4 mr-2" />
+                    Move Down
+                </Button>
             </div>
 
             {/* Content Editor */}
