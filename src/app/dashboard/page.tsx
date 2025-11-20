@@ -1,3 +1,7 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useBuilderStore } from '@/store/builderStore'
 import { AppSidebar } from "@/components/ui/app-sidebar"
 import {
   Breadcrumb,
@@ -20,6 +24,25 @@ import { HeaderActions } from "@/components/builder/HeaderActions"
 import { AutoSaveManager } from "@/components/builder/AutoSaveManager"
 
 export default function Page() {
+  const undo = useBuilderStore((state) => state.undo)
+  const redo = useBuilderStore((state) => state.redo)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        e.preventDefault()
+        if (e.shiftKey) {
+          redo()
+        } else {
+          undo()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo])
+
   return (
     <SidebarProvider>
       <AutoSaveManager />
