@@ -14,13 +14,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Canvas } from "@/components/builder/Canvas"
+import { PropertiesPanel } from "@/components/builder/PropertiesPanel"
 
 export default function Page() {
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -29,7 +30,14 @@ export default function Page() {
             />
           </div>
         </header>
-        <Canvas />
+        <div className="flex flex-1 overflow-hidden h-[calc(100vh-4rem)]">
+          <div className="flex-1 overflow-y-auto bg-muted/10">
+            <Canvas />
+          </div>
+          <aside className="w-80 border-l bg-background overflow-y-auto">
+            <PropertiesPanel />
+          </aside>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )
