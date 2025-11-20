@@ -11,6 +11,8 @@ interface BuilderStore {
     updateBlock: (id: string, updates: Partial<Block>) => void
     deleteBlock: (id: string) => void
     selectBlock: (id: string | null) => void
+    moveBlockUp: (id: string) => void
+    moveBlockDown: (id: string) => void
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -47,7 +49,23 @@ export const useBuilderStore = create<BuilderStore>()(
                 blocks: state.blocks.filter(block => block.id !== id)
             })),
 
-            selectBlock: (id: string | null) => set({ selectedBlockId: id })
+            selectBlock: (id: string | null) => set({ selectedBlockId: id }),
+
+            moveBlockUp: (id: string) => set((state) => {
+                const index = state.blocks.findIndex(b => b.id === id)
+                if (index <= 0) return state
+                const newBlocks = [...state.blocks]
+                    ;[newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]]
+                return { blocks: newBlocks }
+            }),
+
+            moveBlockDown: (id: string) => set((state) => {
+                const index = state.blocks.findIndex(b => b.id === id)
+                if (index < 0 || index >= state.blocks.length - 1) return state
+                const newBlocks = [...state.blocks]
+                    ;[newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]]
+                return { blocks: newBlocks }
+            })
         }),
         {
             name: 'linq-builder-storage',
