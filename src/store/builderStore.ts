@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { Block, GlobalTheme } from '@/types/builder'
 
 interface BuilderStore {
@@ -12,37 +13,48 @@ interface BuilderStore {
     selectBlock: (id: string | null) => void
 }
 
-export const useBuilderStore = create<BuilderStore>((set) => ({
-    blocks: [],
-    selectedBlockId: null,
-    globalTheme: {
-        name: 'minimal',
-        colors: {
-            primary: '#000000',
-            background: '#FFFFFF',
-            text: '#000000',
-            accent: '#666666'
-        },
-        typography: {
-            font: 'Inter',
-            headingSize: 32,
-            bodySize: 16
+export const useBuilderStore = create<BuilderStore>()(
+    persist(
+        (set) => ({
+            blocks: [],
+            selectedBlockId: null,
+            globalTheme: {
+                name: 'minimal',
+                colors: {
+                    primary: '#000000',
+                    background: '#FFFFFF',
+                    text: '#000000',
+                    accent: '#666666'
+                },
+                typography: {
+                    font: 'Inter',
+                    headingSize: 32,
+                    bodySize: 16
+                }
+            },
+
+            addBlock: (block: Block) => set((state) => ({
+                blocks: [...state.blocks, block]
+            })),
+
+            updateBlock: (id: string, updates: Partial<Block>) => set((state) => ({
+                blocks: state.blocks.map(block =>
+                    block.id === id ? { ...block, ...updates } : block
+                )
+            })),
+
+            deleteBlock: (id: string) => set((state) => ({
+                blocks: state.blocks.filter(block => block.id !== id)
+            })),
+
+            selectBlock: (id: string | null) => set({ selectedBlockId: id })
+        }),
+        {
+            name: 'linq-builder-storage',
+            partialize: (state) => ({
+                blocks: state.blocks,
+                globalTheme: state.globalTheme
+            })
         }
-    },
-
-    addBlock: (block: Block) => set((state) => ({
-        blocks: [...state.blocks, block]
-    })),
-
-    updateBlock: (id: string, updates: Partial<Block>) => set((state) => ({
-        blocks: state.blocks.map(block =>
-            block.id === id ? { ...block, ...updates } : block
-        )
-    })),
-
-    deleteBlock: (id: string) => set((state) => ({
-        blocks: state.blocks.filter(block => block.id !== id)
-    })),
-
-    selectBlock: (id: string | null) => set({ selectedBlockId: id })
-}))
+    )
+)
