@@ -6,6 +6,8 @@ interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
     globalTheme: GlobalTheme
+    currentPageId: string | null
+    pageTitle: string
 
     addBlock: (block: Block) => void
     updateBlock: (id: string, updates: Partial<Block>) => void
@@ -15,6 +17,10 @@ interface BuilderStore {
     moveBlockDown: (id: string) => void
     updateGlobalTheme: (theme: GlobalTheme) => void
     applyGlobalTheme: (theme: GlobalTheme) => void
+    setCurrentPageId: (id: string | null) => void
+    setPageTitle: (title: string) => void
+    loadFromDatabase: (pageId: string) => Promise<boolean>
+    saveToDatabase: (title?: string, slug?: string) => Promise<boolean>
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -22,6 +28,8 @@ export const useBuilderStore = create<BuilderStore>()(
         (set) => ({
             blocks: [],
             selectedBlockId: null,
+            currentPageId: null,
+            pageTitle: 'Untitled Page',
             globalTheme: {
                 name: 'minimal',
                 colors: {
@@ -86,7 +94,59 @@ export const useBuilderStore = create<BuilderStore>()(
                         }
                     }
                 })
-            }))
+            })),
+
+            setCurrentPageId: (id: string | null) => set({ currentPageId: id }),
+
+            setPageTitle: (title: string) => set({ pageTitle: title }),
+
+            loadFromDatabase: async (pageId: string) => {
+                try {
+                    const { loadPage } = await import('@/app/actions/pages')
+                    const result = await loadPage(pageId)
+
+                    if (result.success && result.data) {
+                        set({
+                            blocks: result.data.blocks,
+                            globalTheme: result.data.global_theme,
+                            currentPageId: result.data.id,
+                            pageTitle: result.data.title
+                        })
+                        return true
+                    }
+                    return false
+                } catch (error) {
+                    console.error('Failed to load from database:', error)
+                    return false
+                }
+            },
+
+            saveToDatabase: async (title?: string, slug?: string) => {
+                try {
+                    const state = useBuilderStore.getState()
+                    const { savePage } = await import('@/app/actions/pages')
+
+                    const result = await savePage(state.currentPageId, {
+                        title: title || state.pageTitle,
+                        slug: slug || (title || state.pageTitle).toLowerCase().replace(/\s+/g, '-'),
+                        blocks: state.blocks,
+                        global_theme: state.globalTheme,
+                        is_published: false
+                    })
+
+                    if (result.success && result.data) {
+                        set({
+                            currentPageId: result.data.id,
+                            pageTitle: result.data.title
+                        })
+                        return true
+                    }
+                    return false
+                } catch (error) {
+                    console.error('Failed to save to database:', error)
+                    return false
+                }
+            }
         }),
         {
             name: 'linq-builder-storage',
