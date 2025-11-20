@@ -11,19 +11,33 @@ interface BuilderStore {
     past: Block[][]
     future: Block[][]
 
+    /** Adds a new block to the end of the list and records history */
     addBlock: (block: Block) => void
+    /** Updates a specific block by ID and records history */
     updateBlock: (id: string, updates: Partial<Block>) => void
+    /** Deletes a block by ID and records history */
     deleteBlock: (id: string) => void
+    /** Selects a block for editing in the PropertiesPanel */
     selectBlock: (id: string | null) => void
+    /** Moves a block up one position and records history */
     moveBlockUp: (id: string) => void
+    /** Moves a block down one position and records history */
     moveBlockDown: (id: string) => void
+    /** Updates the global theme state without applying it to blocks */
     updateGlobalTheme: (theme: GlobalTheme) => void
+    /** Applies the global theme to all unlocked blocks and records history */
     applyGlobalTheme: (theme: GlobalTheme) => void
+    /** Sets the current database page ID */
     setCurrentPageId: (id: string | null) => void
+    /** Sets the page title */
     setPageTitle: (title: string) => void
+    /** Loads a page from Supabase by ID */
     loadFromDatabase: (pageId: string) => Promise<boolean>
+    /** Saves the current page to Supabase (create or update) */
     saveToDatabase: (title?: string, slug?: string) => Promise<boolean>
+    /** Reverts the last action */
     undo: () => void
+    /** Re-applies the last undone action */
     redo: () => void
 }
 
@@ -99,6 +113,10 @@ export const useBuilderStore = create<BuilderStore>()(
 
             updateGlobalTheme: (theme: GlobalTheme) => set({ globalTheme: theme }),
 
+            /**
+             * Applies the global theme to all blocks that don't have themeLocked set to true.
+             * Updates colors, fonts, and sizes based on block type.
+             */
             applyGlobalTheme: (theme: GlobalTheme) => set((state) => ({
                 globalTheme: theme,
                 past: [...state.past, state.blocks],
@@ -143,6 +161,11 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             },
 
+            /**
+             * Saves the current state to the database.
+             * If currentPageId exists, updates the existing record.
+             * Otherwise, creates a new record.
+             */
             saveToDatabase: async (title?: string, slug?: string) => {
                 try {
                     const state = useBuilderStore.getState()
