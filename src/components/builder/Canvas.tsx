@@ -6,9 +6,13 @@ import { AddBlockButton } from './AddBlockButton'
 
 export function Canvas() {
     const blocks = useBuilderStore((state) => state.blocks)
+    const selectBlock = useBuilderStore((state) => state.selectBlock)
 
     return (
-        <div className="canvas min-h-screen bg-background p-8">
+        <div
+            className="canvas min-h-screen bg-background p-8"
+            onClick={() => selectBlock(null)}
+        >
             <div className="max-w-4xl mx-auto space-y-4">
                 {blocks.length === 0 ? (
                     <p className="text-muted-foreground text-center mb-4">No blocks yet. Add one to get started.</p>
