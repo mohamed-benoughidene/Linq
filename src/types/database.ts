@@ -7,7 +7,7 @@ export interface PageRecord {
     slug: string
     blocks: Block[]
     global_theme: GlobalTheme
-    published: boolean
+    is_published: boolean
     created_at: string
     updated_at: string
 }
@@ -17,7 +17,7 @@ export interface CreatePageInput {
     slug: string
     blocks: Block[]
     global_theme: GlobalTheme
-    published?: boolean
+    is_published?: boolean
 }
 
 export interface UpdatePageInput {
@@ -25,5 +25,5 @@ export interface UpdatePageInput {
     slug?: string
     blocks?: Block[]
     global_theme?: GlobalTheme
-    published?: boolean
+    is_published?: boolean
 }
