@@ -205,6 +205,48 @@ export function PropertiesPanel() {
                 </div>
             </div>
 
+            {/* Border Controls */}
+            <div className="space-y-4">
+                <h3 className="font-medium text-sm">Borders</h3>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="borderWidth">Width (px)</Label>
+                        <Input
+                            id="borderWidth"
+                            type="number"
+                            value={selectedBlock.styles.borderWidth || 0}
+                            onChange={(e) => handleStyleChange('borderWidth', parseInt(e.target.value))}
+                            min={0}
+                            max={20}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="borderRadius">Radius (px)</Label>
+                        <Input
+                            id="borderRadius"
+                            type="number"
+                            value={selectedBlock.styles.borderRadius || 0}
+                            onChange={(e) => handleStyleChange('borderRadius', parseInt(e.target.value))}
+                            min={0}
+                            max={50}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="borderColor">Border Color</Label>
+                    <Input
+                        id="borderColor"
+                        type="color"
+                        value={selectedBlock.styles.borderColor || '#000000'}
+                        onChange={(e) => handleStyleChange('borderColor', e.target.value)}
+                        className="h-10 cursor-pointer"
+                    />
+                </div>
+            </div>
+
             {/* Delete Button */}
             <div className="pt-4 border-t">
                 <Button
