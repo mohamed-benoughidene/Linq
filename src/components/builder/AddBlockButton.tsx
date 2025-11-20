@@ -13,6 +13,7 @@ import { BlockType } from '@/types/builder'
 
 export function AddBlockButton() {
     const addBlock = useBuilderStore((state) => state.addBlock)
+    const blocks = useBuilderStore((state) => state.blocks)
 
     const handleAddBlock = (type: BlockType) => {
         const newBlock = {
@@ -31,6 +32,9 @@ export function AddBlockButton() {
                 click: '',
                 scroll: '',
             },
+            position: blocks.length,
+            themeLocked: false,
+            microInteractionsLocked: false,
         }
         addBlock(newBlock)
     }
