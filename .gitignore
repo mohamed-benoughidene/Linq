@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+ .agent
+ builder-context-for-ai-corrected.md
+ complete-implementation-plan-corrected.md
+ complete-implementation-plan-part2-corrected.md
+ instructions.md
+migration-plan-correct-implementation.md
+ supabase-schema.md
+lunch-Prompt.md
+
