@@ -4,11 +4,15 @@ import { useBuilderStore } from '@/store/builderStore'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Trash2 } from 'lucide-react'
 
 export function PropertiesPanel() {
     const selectedBlockId = useBuilderStore((state) => state.selectedBlockId)
     const blocks = useBuilderStore((state) => state.blocks)
     const updateBlock = useBuilderStore((state) => state.updateBlock)
+    const deleteBlock = useBuilderStore((state) => state.deleteBlock)
+    const selectBlock = useBuilderStore((state) => state.selectBlock)
 
     const selectedBlock = blocks.find(b => b.id === selectedBlockId)
 
@@ -114,6 +118,21 @@ export function PropertiesPanel() {
                         max={100}
                     />
                 </div>
+            </div>
+
+            {/* Delete Button */}
+            <div className="pt-4 border-t">
+                <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => {
+                        deleteBlock(selectedBlock.id)
+                        selectBlock(null)
+                    }}
+                >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Block
+                </Button>
             </div>
         </div>
     )
