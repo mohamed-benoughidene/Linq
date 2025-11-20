@@ -2,13 +2,18 @@
 
 import { Block } from '@/types/builder'
 import { cn } from '@/lib/utils'
+import { useBuilderStore } from '@/store/builderStore'
 
 interface BlockRendererProps {
     block: Block
-    onClick?: () => void
 }
 
-export function BlockRenderer({ block, onClick }: BlockRendererProps) {
+export function BlockRenderer({ block }: BlockRendererProps) {
+    const selectedBlockId = useBuilderStore((state) => state.selectedBlockId)
+    const selectBlock = useBuilderStore((state) => state.selectBlock)
+
+    const isSelected = selectedBlockId === block.id
+
     const combinedStyles = {
         fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
         color: block.styles.color,
@@ -27,19 +32,25 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
         block.microInteractions.hover,
         block.microInteractions.click,
         block.microInteractions.scroll,
-        'cursor-pointer transition-all'
+        'cursor-pointer transition-all relative',
+        isSelected && 'ring-2 ring-primary ring-offset-2'
     )
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        selectBlock(block.id)
+    }
 
     switch (block.type) {
         case 'heading':
             return (
-                <h1 style={combinedStyles} className={className} onClick={onClick}>
+                <h1 style={combinedStyles} className={className} onClick={handleClick}>
                     {block.content || 'Heading'}
                 </h1>
             )
         case 'paragraph':
             return (
-                <p style={combinedStyles} className={className} onClick={onClick}>
+                <p style={combinedStyles} className={className} onClick={handleClick}>
                     {block.content || 'Paragraph'}
                 </p>
             )
@@ -50,7 +61,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
                     alt=""
                     style={combinedStyles}
                     className={className}
-                    onClick={onClick}
+                    onClick={handleClick}
                 />
             )
         case 'link':
@@ -59,7 +70,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
                     href={block.content || '#'}
                     style={combinedStyles}
                     className={className}
-                    onClick={onClick}
+                    onClick={handleClick}
                 >
                     {block.content || 'Link'}
                 </a>
