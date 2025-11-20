@@ -172,17 +172,36 @@ export function PropertiesPanel() {
                         />
                     </div>
                 </div>
+            </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="padding">Padding (px)</Label>
-                    <Input
-                        id="padding"
-                        type="number"
-                        value={selectedBlock.styles.padding || 0}
-                        onChange={(e) => handleStyleChange('padding', parseInt(e.target.value))}
-                        min={0}
-                        max={100}
-                    />
+            {/* Spacing Controls */}
+            <div className="space-y-4">
+                <h3 className="font-medium text-sm">Spacing</h3>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="margin">Margin (px)</Label>
+                        <Input
+                            id="margin"
+                            type="number"
+                            value={selectedBlock.styles.margin || 0}
+                            onChange={(e) => handleStyleChange('margin', parseInt(e.target.value))}
+                            min={0}
+                            max={100}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="padding">Padding (px)</Label>
+                        <Input
+                            id="padding"
+                            type="number"
+                            value={selectedBlock.styles.padding || 0}
+                            onChange={(e) => handleStyleChange('padding', parseInt(e.target.value))}
+                            min={0}
+                            max={100}
+                        />
+                    </div>
                 </div>
             </div>
 
