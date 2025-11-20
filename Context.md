@@ -75,7 +75,8 @@ src/
     actions/
       auth.ts           — ⭐ NEW: Server actions for Google OAuth
 
-    dashboard/          — protected dashboard page
+    dashboard/          — ⭐ UPDATED: Protected dashboard with builder interface
+      page.tsx          — Canvas + PropertiesPanel layout
     forgot-password/    — forgot-password page
     login/              — login page + actions
     signup/             — signup page + actions
@@ -87,17 +88,31 @@ src/
       login-form.tsx     — ⭐ UPDATED: Supports Google OAuth
       signup-form.tsx    — ⭐ UPDATED: Supports Google OAuth
       forgotPasswordForm.tsx
+      textarea.tsx       — ⭐ NEW: Textarea component for block editor
       ...other components
+
+    builder/            — ⭐ NEW: Block-based page builder components
+      Canvas.tsx        — Main canvas component (orchestrator)
+      BlockRenderer.tsx — Read-only block rendering with selection
+      AddBlockButton.tsx — Block creation UI
+      PropertiesPanel.tsx — Block editing sidebar
 
   lib/
     utils.ts            — shared helpers
     rate-limit.ts       — ⭐ Rate limiting configuration with Upstash
+
+  store/                — ⭐ NEW: State management
+    builderStore.ts     — Zustand store with localStorage persistence
+
+  types/                — ⭐ NEW: TypeScript type definitions
+    builder.ts          — Block, theme, and history types
 
   utils/supabase/
     client.ts           — supabase client factory (use client for browser)
     server.ts           — server-side supabase helpers
     middleware.ts       — supabase-related middleware helpers
 ```
+
 
 Top-level files: `middleware.ts`, `next.config.ts`, `package.json`, `tsconfig.json`.
 
@@ -490,7 +505,93 @@ RLS should be configured so users only access their own rows.
 - Handle signup logic in client components
 - Skip rate limiting for "convenience"
 - Commit OAuth credentials to git
-- Mix up hosted vs local Supabase callback URLs
+
+---
+
+## Builder System
+
+The builder is a block-based page editor that allows users to create micro-pages by adding, styling, and arranging blocks. Implementation follows a micro-step approach with strict separation of concerns.
+
+### Core Principles
+
+1. **State Management**: Zustand with localStorage persistence
+   - All builder state lives in `src/store/builderStore.ts`
+   - Avoid local React state (`useState`) for blocks
+   - Automatic persistence to `localStorage` with the key `linq-builder-storage`
+
+2. **Hybrid Styling System**:
+   - **Inline styles** for user-customizable values (fontSize, color, backgroundColor, padding, margin, borders)
+   - **Tailwind classes** for micro-interactions (hover, click, scroll animations)
+   - Never mix these two approaches for the same property
+
+3. **Type Safety**:
+   - All types defined in `src/types/builder.ts`
+   - No `any` types allowed
+   - Block types: `heading`, `paragraph`, `image`, `link`
+
+### Component Architecture
+
+**Canvas** (`src/components/builder/Canvas.tsx`)
+- Orchestrator component that renders the list of blocks
+- Handles background click to deselect blocks
+- Fetches blocks from Zustand store
+- Displays `AddBlockButton` at the bottom
+
+**BlockRenderer** (`src/components/builder/BlockRenderer.tsx`)
+- Read-only component that renders individual blocks
+- Applies inline styles from block.styles
+- Applies Tailwind classes from block.microInteractions
+- Handles click events for selection (with visual ring indicator)
+- Uses `e.stopPropagation()` to prevent canvas deselection
+
+**AddBlockButton** (`src/components/builder/AddBlockButton.tsx`)
+- Dropdown menu to create new blocks
+- Generates unique IDs with `crypto.randomUUID()`
+- Initializes blocks with proper position, themeLocked, and microInteractionsLocked properties
+
+**PropertiesPanel** (`src/components/builder/PropertiesPanel.tsx`)
+- Write-only sidebar for editing selected blocks
+- Organized sections: Reorder, Content, Typography, Colors, Spacing, Borders
+- Includes delete button and move up/down actions
+
+### Store Actions
+
+```typescript
+// Block CRUD
+addBlock(block: Block)
+updateBlock(id: string, updates: Partial<Block>)
+deleteBlock(id: string)
+
+// Selection
+selectBlock(id: string | null)
+
+// Reordering
+moveBlockUp(id: string)
+moveBlockDown(id: string)
+```
+
+### Current Features (Phase 0-6)
+
+- ✅ Block creation (Heading, Paragraph, Image, Link)
+- ✅ Block selection with visual indicators
+- ✅ Content editing (text input / textarea)
+- ✅ Typography controls (font family, weight, size)
+- ✅ Color controls (text & background)
+- ✅ Spacing controls (margin & padding)
+- ✅ Border controls (width, radius, color)
+- ✅ Block reordering (move up/down)
+- ✅ Block deletion
+- ✅ localStorage persistence
+
+### Pending Features (Phase 7+)
+
+- Theme system (predefined themes + per-block locking)
+- Micro-interactions (hover, click, scroll animations)
+- History/undo system
+- Database persistence (save to Supabase)
+- Export functionality (HTML/JSON)
+
+---
 
 ## Deployment Checklist
 
@@ -558,9 +659,11 @@ When deploying to production (Vercel):
 
 - ✅ ~~Implement secure signup with rate limiting~~ (DONE)
 - ✅ ~~Add Google OAuth for login and signup~~ (DONE)
+- ✅ ~~Implement block-based page builder (Phase 0-6)~~ (DONE)
 - Add rate limiting to login endpoint
 - Add rate limiting to password reset
-- Finish block editor & drag-n-drop persistence
+- Continue builder implementation (Phase 7+: Themes, Micro-interactions, etc.)
+- Add drag-n-drop block reordering
 - Harden domain verification; add background verification checks
 - Add tests for key server actions and API routes
 - Set up monitoring/alerts for rate limit abuse
@@ -569,6 +672,23 @@ When deploying to production (Vercel):
 ---
 
 **Recent Updates:**
+
+### Builder System Implementation (Phase 0-6)
+- **Phase 0 - Foundation**: Set up Zustand state management, Sonner toasts, and TypeScript types for blocks
+- **Phase 1 - Store Setup**: Created Zustand store with localStorage persistence, block CRUD actions, and selection state
+- **Phase 2 - Canvas & Rendering**: Built Canvas component, BlockRenderer with hybrid styling (inline + Tailwind), integrated into dashboard
+- **Phase 3 - Block Management**: Added block creation (Heading, Paragraph, Image, Link), selection with visual indicators, canvas deselection
+- **Phase 4 - Properties Panel**: Created editing sidebar with content and basic style controls (font size, colors, padding)
+- **Phase 5 - Deletion & Reordering**: Added delete block, move up/down with smart boundary detection
+- **Phase 6 - Advanced Styling**: Enhanced PropertiesPanel with typography (font family, weight), spacing (margin/padding), and border controls
+
+**Builder Architecture:**
+- **State Management**: Zustand with persist middleware (localStorage)
+- **Hybrid Styling**: Inline styles for user-customizable values, Tailwind classes for micro-interactions
+- **Component Separation**: Canvas (orchestrator), BlockRenderer (read-only), PropertiesPanel (write-only)
+- **Type Safety**: Strict TypeScript types in `src/types/builder.ts`
+
+### Authentication & Security
 - Added Google OAuth authentication (login + signup)
 - Created OAuth callback handler and server action
 - Updated login/signup forms with OAuth support
