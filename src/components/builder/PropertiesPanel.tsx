@@ -24,6 +24,15 @@ export function PropertiesPanel() {
         updateBlock(selectedBlock.id, { content: value })
     }
 
+    const handleStyleChange = (property: string, value: any) => {
+        updateBlock(selectedBlock.id, {
+            styles: {
+                ...selectedBlock.styles,
+                [property]: value
+            }
+        })
+    }
+
     return (
         <div className="p-4 space-y-6">
             <div>
@@ -52,6 +61,59 @@ export function PropertiesPanel() {
                         placeholder={`Enter ${selectedBlock.type} content...`}
                     />
                 )}
+            </div>
+
+            {/* Style Controls */}
+            <div className="space-y-4">
+                <h3 className="font-medium text-sm">Styles</h3>
+
+                <div className="space-y-2">
+                    <Label htmlFor="fontSize">Font Size (px)</Label>
+                    <Input
+                        id="fontSize"
+                        type="number"
+                        value={selectedBlock.styles.fontSize || 16}
+                        onChange={(e) => handleStyleChange('fontSize', parseInt(e.target.value))}
+                        min={8}
+                        max={96}
+                    />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="color">Text Color</Label>
+                        <Input
+                            id="color"
+                            type="color"
+                            value={selectedBlock.styles.color || '#000000'}
+                            onChange={(e) => handleStyleChange('color', e.target.value)}
+                            className="h-10 cursor-pointer"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="backgroundColor">Background</Label>
+                        <Input
+                            id="backgroundColor"
+                            type="color"
+                            value={selectedBlock.styles.backgroundColor || '#FFFFFF'}
+                            onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                            className="h-10 cursor-pointer"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="padding">Padding (px)</Label>
+                    <Input
+                        id="padding"
+                        type="number"
+                        value={selectedBlock.styles.padding || 0}
+                        onChange={(e) => handleStyleChange('padding', parseInt(e.target.value))}
+                        min={0}
+                        max={100}
+                    />
+                </div>
             </div>
         </div>
     )
