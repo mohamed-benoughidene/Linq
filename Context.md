@@ -549,10 +549,19 @@ The builder is a block-based page editor that allows users to create micro-pages
 - Generates unique IDs with `crypto.randomUUID()`
 - Initializes blocks with proper position, themeLocked, and microInteractionsLocked properties
 
-**PropertiesPanel** (`src/components/builder/PropertiesPanel.tsx`)
-- Write-only sidebar for editing selected blocks
-- Organized sections: Reorder, Content, Typography, Colors, Spacing, Borders
-- Includes delete button and move up/down actions
+**ThemesSection** (`src/components/builder/ThemesSection.tsx`)
+- Sidebar component for selecting global themes
+- Displays color swatches for predefined themes
+- Applies themes to all unlocked blocks via store action
+
+**HeaderActions** (`src/components/builder/HeaderActions.tsx`)
+- Header component containing Save button and Page Title input
+- Handles manual save to database
+- Displays Undo/Redo buttons
+
+**AutoSaveManager** (`src/components/builder/AutoSaveManager.tsx`)
+- Invisible component that handles background auto-saving
+- Triggers save every 30 seconds if page has an ID
 
 ### Store Actions
 
@@ -568,9 +577,23 @@ selectBlock(id: string | null)
 // Reordering
 moveBlockUp(id: string)
 moveBlockDown(id: string)
+
+// Themes
+updateGlobalTheme(theme: GlobalTheme)
+applyGlobalTheme(theme: GlobalTheme)
+
+// History
+undo()
+redo()
+
+// Database
+saveToDatabase(title?: string, slug?: string)
+loadFromDatabase(pageId: string)
+setCurrentPageId(id: string | null)
+setPageTitle(title: string)
 ```
 
-### Current Features (Phase 0-6)
+### Completed Features (Phase 0-9)
 
 - ✅ Block creation (Heading, Paragraph, Image, Link)
 - ✅ Block selection with visual indicators
@@ -581,15 +604,16 @@ moveBlockDown(id: string)
 - ✅ Border controls (width, radius, color)
 - ✅ Block reordering (move up/down)
 - ✅ Block deletion
+- ✅ Theme System (6 predefined themes + per-block locking)
+- ✅ Database Persistence (Save/Load + Auto-save)
+- ✅ Undo/Redo System (with keyboard shortcuts)
 - ✅ localStorage persistence
 
-### Pending Features (Phase 7+)
+### Pending Features (Phase 10+)
 
-- Theme system (predefined themes + per-block locking)
-- Micro-interactions (hover, click, scroll animations)
-- History/undo system
-- Database persistence (save to Supabase)
 - Export functionality (HTML/JSON)
+- Public view page (rendering pages via slug)
+- Micro-interactions (hover, click, scroll animations)
 
 ---
 
