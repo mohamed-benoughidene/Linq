@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 
 export function PropertiesPanel() {
     const selectedBlockId = useBuilderStore((state) => state.selectedBlockId)
@@ -70,6 +71,23 @@ export function PropertiesPanel() {
                     <ArrowDown className="h-4 w-4 mr-2" />
                     Move Down
                 </Button>
+            </div>
+
+            {/* Theme Lock Toggle */}
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="space-y-0.5">
+                    <Label htmlFor="theme-lock" className="text-sm font-medium">
+                        Lock Theme
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                        Prevent global theme changes
+                    </p>
+                </div>
+                <Switch
+                    id="theme-lock"
+                    checked={selectedBlock.themeLocked}
+                    onCheckedChange={(checked) => updateBlock(selectedBlock.id, { themeLocked: checked })}
+                />
             </div>
 
             {/* Content Editor */}
