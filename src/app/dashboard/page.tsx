@@ -16,20 +16,24 @@ import {
 import { Canvas } from "@/components/builder/Canvas"
 import { PropertiesPanel } from "@/components/builder/PropertiesPanel"
 import { ThemesSection } from "@/components/builder/ThemesSection"
+import { HeaderActions } from "@/components/builder/HeaderActions"
+import { AutoSaveManager } from "@/components/builder/AutoSaveManager"
 
 export default function Page() {
   return (
     <SidebarProvider>
+      <AutoSaveManager />
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-          <div className="flex items-center gap-2 px-4">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
+          <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
+          <HeaderActions />
         </header>
         <div className="flex flex-1 overflow-hidden h-[calc(100vh-4rem)]">
           <div className="flex-1 overflow-y-auto bg-muted/10">

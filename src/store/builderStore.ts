@@ -152,7 +152,9 @@ export const useBuilderStore = create<BuilderStore>()(
             name: 'linq-builder-storage',
             partialize: (state) => ({
                 blocks: state.blocks,
-                globalTheme: state.globalTheme
+                globalTheme: state.globalTheme,
+                currentPageId: state.currentPageId,
+                pageTitle: state.pageTitle
             })
         }
     )
