@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Canvas } from "@/components/builder/Canvas"
 import { PropertiesPanel } from "@/components/builder/PropertiesPanel"
+import { ThemesSection } from "@/components/builder/ThemesSection"
 
 export default function Page() {
   return (
@@ -35,6 +36,8 @@ export default function Page() {
             <Canvas />
           </div>
           <aside className="w-80 border-l bg-background overflow-y-auto">
+            <ThemesSection />
+            <Separator />
             <PropertiesPanel />
           </aside>
         </div>
