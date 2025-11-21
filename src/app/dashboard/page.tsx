@@ -18,8 +18,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Canvas } from "@/components/builder/Canvas"
-// import { PropertiesPanel } from "@/components/builder/PropertiesPanel"
-// import { ThemesSection } from "@/components/builder/ThemesSection"
+import { ThemesSection } from "@/components/builder/ThemesSection"
 // import { HeaderActions } from "@/components/builder/HeaderActions"
 // import { AutoSaveManager } from "@/components/builder/AutoSaveManager"
 
@@ -63,9 +62,8 @@ export default function Page() {
             <Canvas />
           </div>
           <aside className="w-80 border-l bg-background overflow-y-auto">
-            {/* <ThemesSection /> */}
+            <ThemesSection />
             <Separator />
-            {/* <PropertiesPanel /> */}
           </aside>
         </div>
       </SidebarInset>

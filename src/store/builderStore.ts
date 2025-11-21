@@ -1,12 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Block, GlobalTheme, GlobalMicroInteractions, HistoryState } from '@/types/builder'
+import { Block, GlobalTheme, HistoryState } from '@/types/builder'
 
 interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
     globalTheme: GlobalTheme
-    globalMicroInteractions: GlobalMicroInteractions
     history: HistoryState
 
     addBlock: (block: Block) => void
@@ -14,6 +13,7 @@ interface BuilderStore {
     deleteBlock: (id: string) => void
     selectBlock: (id: string | null) => void
     duplicateBlock: (id: string) => void
+    applyGlobalTheme: (theme: GlobalTheme) => void
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -34,11 +34,6 @@ export const useBuilderStore = create<BuilderStore>()(
                     headingSize: 32,
                     bodySize: 16
                 }
-            },
-            globalMicroInteractions: {
-                hover: '',
-                click: '',
-                scroll: ''
             },
             history: {
                 past: [],
@@ -75,14 +70,31 @@ export const useBuilderStore = create<BuilderStore>()(
                 return {
                     blocks: [...state.blocks, duplicatedBlock]
                 }
-            })
+            }),
+
+            applyGlobalTheme: (theme: GlobalTheme) => set((state) => ({
+                globalTheme: theme,
+                blocks: state.blocks.map(block => {
+                    if (block.themeLocked) return block
+
+                    return {
+                        ...block,
+                        styles: {
+                            ...block.styles,
+                            color: theme.colors.text,
+                            backgroundColor: theme.colors.background,
+                            fontSize: block.type === 'heading' ? theme.typography.headingSize : theme.typography.bodySize,
+                            // We preserve margin/padding/border unless we want to reset them
+                        }
+                    }
+                })
+            }))
         }),
         {
             name: 'linq-builder-storage',
             partialize: (state) => ({
                 blocks: state.blocks,
-                globalTheme: state.globalTheme,
-                globalMicroInteractions: state.globalMicroInteractions
+                globalTheme: state.globalTheme
             })
         }
     )

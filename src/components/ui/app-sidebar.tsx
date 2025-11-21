@@ -12,6 +12,7 @@ import {
   Send,
   Settings2,
   SquareTerminal,
+  PackagePlus,
 } from "lucide-react"
 
 import { NavMain } from "@/components/ui/nav-main"
@@ -26,7 +27,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar"
+import { AddBlockModal } from "@/components/builder/AddBlockModal"
+import { useBuilderStore } from "@/store/builderStore"
+import { BlockType, Block } from "@/types/builder"
+import { toast } from "sonner"
 
 const data = {
   user: {
@@ -152,34 +159,88 @@ const data = {
   ],
 }
 
+function createDefaultBlock(type: BlockType): Block {
+  return {
+    id: crypto.randomUUID(),
+    type,
+    position: Date.now(),
+    content: type === 'image' ? 'https://via.placeholder.com/400x300' : '',
+    styles: {
+      fontSize: type === 'heading' ? 32 : 16,
+      color: '#000000',
+      margin: 8,
+      padding: 8,
+    },
+    microInteractions: {
+      hover: '',
+      click: '',
+      scroll: '',
+    },
+    themeLocked: false,
+    microInteractionsLocked: false,
+  }
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [addBlockModalOpen, setAddBlockModalOpen] = React.useState(false)
+  const { addBlock } = useBuilderStore()
+
+  const handleSelectBlock = (type: BlockType) => {
+    const newBlock = createDefaultBlock(type)
+    addBlock(newBlock)
+    toast.success('Block added', {
+      description: `${type} block added to canvas`,
+    })
+  }
+
   return (
-    <Sidebar variant="inset" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
+    <>
+      <Sidebar variant="inset" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild>
+                <a href="#">
+                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <Command className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">Acme Inc</span>
+                    <span className="truncate text-xs">Enterprise</span>
+                  </div>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          {/* Add Blocks Section */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Add Blocks</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => setAddBlockModalOpen(true)}>
+                  <PackagePlus className="h-4 w-4" />
+                  <span>Static Blocks</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+
+          <NavMain items={data.navMain} />
+          <NavProjects projects={data.projects} />
+          <NavSecondary items={data.navSecondary} className="mt-auto" />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
+      </Sidebar>
+
+      <AddBlockModal
+        open={addBlockModalOpen}
+        onOpenChange={setAddBlockModalOpen}
+        onSelectBlock={handleSelectBlock}
+      />
+    </>
   )
 }

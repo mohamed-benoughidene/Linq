@@ -2,9 +2,18 @@
 
 import { useBuilderStore } from '@/store/builderStore'
 import { BlockRenderer } from './BlockRenderer'
+import { BlockEditor } from './BlockEditor'
+import { useEffect } from 'react'
 
 export function Canvas() {
-    const { blocks, selectBlock } = useBuilderStore()
+    const { blocks, selectedBlockId, selectBlock } = useBuilderStore()
+
+    useEffect(() => {
+        // Expose store to window for debugging/testing
+        if (typeof window !== 'undefined') {
+            (window as any).useBuilderStore = useBuilderStore
+        }
+    }, [])
 
     return (
         <div className="canvas min-h-screen bg-background p-8">
@@ -15,11 +24,16 @@ export function Canvas() {
                     </p>
                 ) : (
                     blocks.map((block) => (
-                        <BlockRenderer
+                        <BlockEditor
                             key={block.id}
                             block={block}
-                            onClick={() => selectBlock(block.id)}
-                        />
+                            open={selectedBlockId === block.id}
+                            onOpenChange={(open) => selectBlock(open ? block.id : null)}
+                        >
+                            <div>
+                                <BlockRenderer block={block} />
+                            </div>
+                        </BlockEditor>
                     ))
                 )}
             </div>
