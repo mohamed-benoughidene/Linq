@@ -1,7 +1,12 @@
+
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Block, GlobalTheme, GlobalMicroInteractions, BlockMicroInteractions, HistoryState } from '@/types/builder'
 
+/**
+ * Main state interface for the page builder.
+ * Manages blocks, selection, global settings, and undo/redo history.
+ */
 interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
@@ -9,15 +14,20 @@ interface BuilderStore {
     globalMicroInteractions: GlobalMicroInteractions
     history: HistoryState
 
+    // Block CRUD
     addBlock: (block: Block) => void
     updateBlock: (id: string, updates: Partial<Block>) => void
     deleteBlock: (id: string) => void
     selectBlock: (id: string | null) => void
     duplicateBlock: (id: string) => void
+
+    // Global Settings
     applyGlobalTheme: (theme: GlobalTheme) => void
     applyBlockTheme: (id: string, theme: GlobalTheme) => void
     applyGlobalMicroInteractions: (interactions: GlobalMicroInteractions) => void
     applyBlockMicroInteractions: (id: string, interactions: Partial<BlockMicroInteractions>) => void
+
+    // History
     undo: () => void
     redo: () => void
 }
@@ -52,6 +62,9 @@ export const useBuilderStore = create<BuilderStore>()(
                 future: []
             },
 
+            /**
+             * Adds a new block to the canvas and records history.
+             */
             addBlock: (block: Block) => set((state) => {
                 if (state.blocks.some(b => b.id === block.id)) {
                     return state
@@ -67,6 +80,9 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Updates an existing block and records history.
+             */
             updateBlock: (id: string, updates: Partial<Block>) => set((state) => {
                 const newBlocks = state.blocks.map(block =>
                     block.id === id ? { ...block, ...updates } : block
@@ -82,6 +98,9 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Deletes a block by ID and records history.
+             */
             deleteBlock: (id: string) => set((state) => {
                 const newBlocks = state.blocks.filter(block => block.id !== id)
                 const newHistory = {
@@ -97,6 +116,9 @@ export const useBuilderStore = create<BuilderStore>()(
 
             selectBlock: (id: string | null) => set({ selectedBlockId: id }),
 
+            /**
+             * Duplicates a block, assigning a new ID and position.
+             */
             duplicateBlock: (id: string) => set((state) => {
                 const blockToDuplicate = state.blocks.find(b => b.id === id)
                 if (!blockToDuplicate) return state
@@ -120,6 +142,10 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Applies a global theme to all unlocked blocks.
+             * Respects `themeLocked` property on blocks.
+             */
             applyGlobalTheme: (theme: GlobalTheme) => set((state) => {
                 const newBlocks = state.blocks.map(block => {
                     if (block.themeLocked) return block
@@ -177,6 +203,10 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Applies global micro-interactions to all unlocked blocks.
+             * Respects `microInteractionsLocked` property.
+             */
             applyGlobalMicroInteractions: (interactions: GlobalMicroInteractions) => set((state) => {
                 const newBlocks = state.blocks.map(block => {
                     if (block.microInteractionsLocked) return block
@@ -228,6 +258,9 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Reverts the last change by popping from `past` history.
+             */
             undo: () => set((state) => {
                 const { past, present, future } = state.history
                 if (past.length === 0) return state
@@ -245,6 +278,9 @@ export const useBuilderStore = create<BuilderStore>()(
                 }
             }),
 
+            /**
+             * Re-applies a reverted change by popping from `future` history.
+             */
             redo: () => set((state) => {
                 const { past, present, future } = state.history
                 if (future.length === 0) return state

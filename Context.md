@@ -605,6 +605,7 @@ setPageTitle(title: string)
 - ✅ Block reordering (move up/down)
 - ✅ Block deletion
 - ✅ Theme System (6 predefined themes + per-block locking)
+- ✅ Micro-interactions (Hover, Click, Scroll effects + per-block locking)
 - ✅ Database Persistence (Save/Load + Auto-save)
 - ✅ Undo/Redo System (with keyboard shortcuts)
 - ✅ localStorage persistence
@@ -613,7 +614,6 @@ setPageTitle(title: string)
 
 - Export functionality (HTML/JSON)
 - Public view page (rendering pages via slug)
-- Micro-interactions (hover, click, scroll animations)
 
 ---
 
@@ -683,10 +683,9 @@ When deploying to production (Vercel):
 
 - ✅ ~~Implement secure signup with rate limiting~~ (DONE)
 - ✅ ~~Add Google OAuth for login and signup~~ (DONE)
-- ✅ ~~Implement block-based page builder (Phase 0-6)~~ (DONE)
+- ✅ ~~Implement block-based page builder (Phase 0-9)~~ (DONE)
 - Add rate limiting to login endpoint
 - Add rate limiting to password reset
-- Continue builder implementation (Phase 7+: Themes, Micro-interactions, etc.)
 - Add drag-n-drop block reordering
 - Harden domain verification; add background verification checks
 - Add tests for key server actions and API routes
@@ -697,7 +696,7 @@ When deploying to production (Vercel):
 
 **Recent Updates:**
 
-### Builder System Implementation (Phase 0-6)
+### Builder System Implementation (Phase 0-9)
 - **Phase 0 - Foundation**: Set up Zustand state management, Sonner toasts, and TypeScript types for blocks
 - **Phase 1 - Store Setup**: Created Zustand store with localStorage persistence, block CRUD actions, and selection state
 - **Phase 2 - Canvas & Rendering**: Built Canvas component, BlockRenderer with hybrid styling (inline + Tailwind), integrated into dashboard
@@ -705,12 +704,17 @@ When deploying to production (Vercel):
 - **Phase 4 - Properties Panel**: Created editing sidebar with content and basic style controls (font size, colors, padding)
 - **Phase 5 - Deletion & Reordering**: Added delete block, move up/down with smart boundary detection
 - **Phase 6 - Advanced Styling**: Enhanced PropertiesPanel with typography (font family, weight), spacing (margin/padding), and border controls
+- **Phase 7 - Global Themes**: Implemented theme system with "Apply Button" pattern and per-block locking
+- **Phase 8 - Micro-Interactions**: Added hover/click/scroll effects with global controls and per-block locking
+- **Phase 9 - Undo/Redo**: Implemented history tracking with keyboard shortcuts (Ctrl+Z/Ctrl+Y)
 
 **Builder Architecture:**
 - **State Management**: Zustand with persist middleware (localStorage)
 - **Hybrid Styling**: Inline styles for user-customizable values, Tailwind classes for micro-interactions
-- **Component Separation**: Canvas (orchestrator), BlockRenderer (read-only), PropertiesPanel (write-only)
+- **Component Separation**: Canvas (orchestrator), BlockRenderer (read-only), BlockEditor (write-only)
 - **Type Safety**: Strict TypeScript types in `src/types/builder.ts`
+- **Dual Lock System**: `themeLocked` prevents global theme changes, `microInteractionsLocked` prevents global interaction changes
+- **Apply Button Pattern**: Expensive operations (applying global themes/interactions) require explicit user action, while local edits are live
 
 ### Authentication & Security
 - Added Google OAuth authentication (login + signup)

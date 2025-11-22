@@ -60,8 +60,7 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
         updateBlock(block.id, { themeLocked: !block.themeLocked })
     }
 
-    const handleApplyBlockTheme = () => {
-        const theme = themes[selectedTheme]
+    const handleApplyBlockTheme = (theme: any) => {
         if (!theme) return
 
         applyBlockTheme(block.id, theme)
@@ -104,57 +103,48 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                         ) : (
                             <Unlock className="h-4 w-4 text-muted-foreground" />
                         )}
-                        <Label htmlFor="themeLock" className="text-sm font-medium">
-                            Theme Lock
-                        </Label>
+                        <Label className="text-sm font-medium">Theme Lock</Label>
+                        <Switch
+                            checked={block.themeLocked}
+                            onCheckedChange={toggleThemeLock}
+                        />
                     </div>
-                    <Switch
-                        id="themeLock"
-                        checked={block.themeLocked}
-                        onCheckedChange={toggleThemeLock}
-                    />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                    {block.themeLocked
-                        ? "🔒 This block won't change when global theme is applied"
-                        : "🔓 This block will update with global theme changes"
-                    }
-                </p>
 
-                {/* Quick Theme Apply for This Block */}
-                <div className="space-y-2 pt-2">
-                    <Label className="text-xs font-medium">Quick Theme</Label>
-                    <div className="flex gap-2 flex-wrap">
-                        {Object.keys(themes).map((key) => (
-                            <button
-                                key={key}
-                                onClick={() => setSelectedTheme(key)}
-                                className={`text-xs px-2 py-1 rounded border transition-colors ${selectedTheme === key ? 'bg-accent border-primary' : 'hover:bg-accent/50'
-                                    }`}
-                            >
-                                {themes[key].name}
-                            </button>
-                        ))}
-                    </div>
-                    <Button
-                        onClick={handleApplyBlockTheme}
-                        size="sm"
-                        variant="outline"
-                        className="w-full"
-                    >
-                        Apply to This Block
-                    </Button>
+                    {!block.themeLocked && (
+                        <p className="text-xs text-muted-foreground">
+                            Lock to prevent global theme changes from affecting this block
+                        </p>
+                    )}
+
+                    {block.themeLocked && (
+                        <div className="bg-muted/50 p-3 rounded-md space-y-2 mt-2">
+                            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
+                                <Lock className="h-3 w-3" />
+                                Quick Theme Apply
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                {Object.values(themes).map((theme) => (
+                                    <Button
+                                        key={theme.name}
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 text-[10px] px-1"
+                                        onClick={() => handleApplyBlockTheme(theme)}
+                                    >
+                                        {theme.name}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Micro-Interactions Section */}
-            <div className="space-y-3 pt-4 border-t">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="microLock" className="text-sm font-medium">
-                        Micro-Interactions Lock
-                    </Label>
+            <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-medium">Micro-Interactions Lock</Label>
                     <Switch
-                        id="microLock"
                         checked={block.microInteractionsLocked}
                         onCheckedChange={toggleMicroInteractionsLock}
                     />
