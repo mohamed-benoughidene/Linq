@@ -1,8 +1,8 @@
 import { GlobalTheme } from '@/types/builder'
 
-export const predefinedThemes: GlobalTheme[] = [
-    {
-        name: 'minimal',
+export const themes: Record<string, GlobalTheme> = {
+    minimal: {
+        name: 'Minimal',
         colors: {
             primary: '#000000',
             background: '#FFFFFF',
@@ -15,8 +15,8 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 16
         }
     },
-    {
-        name: 'dark',
+    dark: {
+        name: 'Dark',
         colors: {
             primary: '#FFFFFF',
             background: '#1A1A1A',
@@ -29,8 +29,8 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 16
         }
     },
-    {
-        name: 'vibrant',
+    vibrant: {
+        name: 'Vibrant',
         colors: {
             primary: '#FF6B6B',
             background: '#F8F9FA',
@@ -43,8 +43,8 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 18
         }
     },
-    {
-        name: 'ocean',
+    ocean: {
+        name: 'Ocean',
         colors: {
             primary: '#0077B6',
             background: '#F0F9FF',
@@ -57,8 +57,8 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 17
         }
     },
-    {
-        name: 'sunset',
+    sunset: {
+        name: 'Sunset',
         colors: {
             primary: '#FF6F00',
             background: '#FFF8E1',
@@ -71,8 +71,8 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 18
         }
     },
-    {
-        name: 'forest',
+    forest: {
+        name: 'Forest',
         colors: {
             primary: '#2D6A4F',
             background: '#F1F8F4',
@@ -85,8 +85,4 @@ export const predefinedThemes: GlobalTheme[] = [
             bodySize: 16
         }
     }
-]
-
-export function getThemeByName(name: string): GlobalTheme | undefined {
-    return predefinedThemes.find(theme => theme.name === name)
 }

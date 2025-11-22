@@ -34,6 +34,7 @@ import { AddBlockModal } from "@/components/builder/AddBlockModal"
 import { useBuilderStore } from "@/store/builderStore"
 import { BlockType, Block } from "@/types/builder"
 import { toast } from "sonner"
+import { ThemesSection } from "@/components/builder/ThemesSection"
 
 const data = {
   user: {
@@ -223,6 +224,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <PackagePlus className="h-4 w-4" />
                   <span>Static Blocks</span>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+
+          {/* Themes Section */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Design</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <ThemesSection />
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>

@@ -14,6 +14,7 @@ interface BuilderStore {
     selectBlock: (id: string | null) => void
     duplicateBlock: (id: string) => void
     applyGlobalTheme: (theme: GlobalTheme) => void
+    applyBlockTheme: (id: string, theme: GlobalTheme) => void
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -41,9 +42,12 @@ export const useBuilderStore = create<BuilderStore>()(
                 future: []
             },
 
-            addBlock: (block: Block) => set((state) => ({
-                blocks: [...state.blocks, block]
-            })),
+            addBlock: (block: Block) => set((state) => {
+                if (state.blocks.some(b => b.id === block.id)) {
+                    return state
+                }
+                return { blocks: [...state.blocks, block] }
+            }),
 
             updateBlock: (id: string, updates: Partial<Block>) => set((state) => ({
                 blocks: state.blocks.map(block =>
@@ -84,7 +88,24 @@ export const useBuilderStore = create<BuilderStore>()(
                             color: theme.colors.text,
                             backgroundColor: theme.colors.background,
                             fontSize: block.type === 'heading' ? theme.typography.headingSize : theme.typography.bodySize,
-                            // We preserve margin/padding/border unless we want to reset them
+                            fontFamily: theme.typography.font,
+                        }
+                    }
+                })
+            })),
+
+            applyBlockTheme: (id: string, theme: GlobalTheme) => set((state) => ({
+                blocks: state.blocks.map(block => {
+                    if (block.id !== id) return block
+
+                    return {
+                        ...block,
+                        styles: {
+                            ...block.styles,
+                            color: theme.colors.text,
+                            backgroundColor: theme.colors.background,
+                            fontSize: block.type === 'heading' ? theme.typography.headingSize : theme.typography.bodySize,
+                            fontFamily: theme.typography.font,
                         }
                     }
                 })

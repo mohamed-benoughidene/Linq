@@ -7,6 +7,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useBuilderStore } from '@/store/builderStore'
 import { useDebounceCallback } from 'usehooks-ts'
+import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
+import { Lock, Unlock } from 'lucide-react'
+import { themes } from '@/lib/themes'
+import { toast } from 'sonner'
 
 interface BlockEditorProps {
     block: Block
@@ -18,7 +23,8 @@ interface BlockEditorProps {
 export function BlockEditor({ block, open, onOpenChange, children }: BlockEditorProps) {
     const [isMobile, setIsMobile] = useState(false)
     const [content, setContent] = useState(block.content)
-    const { updateBlock } = useBuilderStore()
+    const { updateBlock, applyBlockTheme } = useBuilderStore()
+    const [selectedTheme, setSelectedTheme] = useState<string>('minimal')
 
     // Sync local state ONLY when switching to a different block
     // NOT when content updates (to avoid bouncing while typing)
@@ -49,6 +55,20 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
         })
     }
 
+    const toggleThemeLock = () => {
+        updateBlock(block.id, { themeLocked: !block.themeLocked })
+    }
+
+    const handleApplyBlockTheme = () => {
+        const theme = themes[selectedTheme]
+        if (!theme) return
+
+        applyBlockTheme(block.id, theme)
+        toast.success('Theme applied', {
+            description: 'Theme applied to this block only',
+        })
+    }
+
     const editorContent = (
         <div className="space-y-4 h-full overflow-y-auto pr-4">
             <div className="flex items-center justify-between">
@@ -68,6 +88,58 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                 <p className="text-xs text-muted-foreground">
                     Changes save automatically after you stop typing
                 </p>
+            </div>
+
+            {/* Theme Section */}
+            <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        {block.themeLocked ? (
+                            <Lock className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                            <Unlock className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <Label htmlFor="themeLock" className="text-sm font-medium">
+                            Theme Lock
+                        </Label>
+                    </div>
+                    <Switch
+                        id="themeLock"
+                        checked={block.themeLocked}
+                        onCheckedChange={toggleThemeLock}
+                    />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    {block.themeLocked
+                        ? "🔒 This block won't change when global theme is applied"
+                        : "🔓 This block will update with global theme changes"
+                    }
+                </p>
+
+                {/* Quick Theme Apply for This Block */}
+                <div className="space-y-2 pt-2">
+                    <Label className="text-xs font-medium">Quick Theme</Label>
+                    <div className="flex gap-2 flex-wrap">
+                        {Object.keys(themes).map((key) => (
+                            <button
+                                key={key}
+                                onClick={() => setSelectedTheme(key)}
+                                className={`text-xs px-2 py-1 rounded border transition-colors ${selectedTheme === key ? 'bg-accent border-primary' : 'hover:bg-accent/50'
+                                    }`}
+                            >
+                                {themes[key].name}
+                            </button>
+                        ))}
+                    </div>
+                    <Button
+                        onClick={handleApplyBlockTheme}
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                    >
+                        Apply to This Block
+                    </Button>
+                </div>
             </div>
 
             {/* Typography Section */}

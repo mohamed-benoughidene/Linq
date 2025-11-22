@@ -26,9 +26,9 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
 
     // HYBRID STYLING: Tailwind classes for micro-interactions
     const className = cn(
-        block.microInteractions.hover,
-        block.microInteractions.click,
-        block.microInteractions.scroll,
+        block.microInteractions?.hover,
+        block.microInteractions?.click,
+        block.microInteractions?.scroll,
         'cursor-pointer transition-all'
     )
 
