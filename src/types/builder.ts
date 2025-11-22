@@ -19,6 +19,8 @@ export type BlockMicroInteractions = {
     scroll?: string
 }
 
+export type GlobalMicroInteractions = BlockMicroInteractions
+
 export type Block = {
     id: string
     type: BlockType

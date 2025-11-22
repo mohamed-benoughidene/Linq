@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Lock, Unlock } from 'lucide-react'
 import { themes } from '@/lib/themes'
 import { toast } from 'sonner'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface BlockEditorProps {
     block: Block
@@ -67,6 +68,10 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
         toast.success('Theme applied', {
             description: 'Theme applied to this block only',
         })
+    }
+
+    const toggleMicroInteractionsLock = () => {
+        updateBlock(block.id, { microInteractionsLocked: !block.microInteractionsLocked })
     }
 
     const editorContent = (
@@ -140,6 +145,87 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                         Apply to This Block
                     </Button>
                 </div>
+            </div>
+
+            {/* Micro-Interactions Section */}
+            <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="microLock" className="text-sm font-medium">
+                        Micro-Interactions Lock
+                    </Label>
+                    <Switch
+                        id="microLock"
+                        checked={block.microInteractionsLocked}
+                        onCheckedChange={toggleMicroInteractionsLock}
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-xs">Hover Effect</Label>
+                    <Select
+                        value={block.microInteractions?.hover || " "}
+                        onValueChange={(value) => updateBlock(block.id, {
+                            microInteractions: { ...block.microInteractions, hover: value === " " ? "" : value }
+                        })}
+                        disabled={!block.microInteractionsLocked}
+                    >
+                        <SelectTrigger className="h-8">
+                            <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value=" ">None</SelectItem>
+                            <SelectItem value="hover:scale-105">Scale Up</SelectItem>
+                            <SelectItem value="hover:scale-95">Scale Down</SelectItem>
+                            <SelectItem value="hover:opacity-80">Fade</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-xs">Click Animation</Label>
+                    <Select
+                        value={block.microInteractions?.click || " "}
+                        onValueChange={(value) => updateBlock(block.id, {
+                            microInteractions: { ...block.microInteractions, click: value === " " ? "" : value }
+                        })}
+                        disabled={!block.microInteractionsLocked}
+                    >
+                        <SelectTrigger className="h-8">
+                            <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value=" ">None</SelectItem>
+                            <SelectItem value="active:scale-95">Shrink</SelectItem>
+                            <SelectItem value="active:scale-105">Grow</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-xs">Scroll Animation</Label>
+                    <Select
+                        value={block.microInteractions?.scroll || " "}
+                        onValueChange={(value) => updateBlock(block.id, {
+                            microInteractions: { ...block.microInteractions, scroll: value === " " ? "" : value }
+                        })}
+                        disabled={!block.microInteractionsLocked}
+                    >
+                        <SelectTrigger className="h-8">
+                            <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value=" ">None</SelectItem>
+                            <SelectItem value="animate-fade-in">Fade In</SelectItem>
+                            <SelectItem value="animate-slide-up">Slide Up</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {!block.microInteractionsLocked && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                        Lock to customize interactions for this block
+                    </p>
+                )}
             </div>
 
             {/* Typography Section */}

@@ -1,11 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Block, GlobalTheme, HistoryState } from '@/types/builder'
+import { Block, GlobalTheme, GlobalMicroInteractions, BlockMicroInteractions, HistoryState } from '@/types/builder'
 
 interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
     globalTheme: GlobalTheme
+    globalMicroInteractions: GlobalMicroInteractions
     history: HistoryState
 
     addBlock: (block: Block) => void
@@ -15,6 +16,8 @@ interface BuilderStore {
     duplicateBlock: (id: string) => void
     applyGlobalTheme: (theme: GlobalTheme) => void
     applyBlockTheme: (id: string, theme: GlobalTheme) => void
+    applyGlobalMicroInteractions: (interactions: GlobalMicroInteractions) => void
+    applyBlockMicroInteractions: (id: string, interactions: Partial<BlockMicroInteractions>) => void
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -35,6 +38,11 @@ export const useBuilderStore = create<BuilderStore>()(
                     headingSize: 32,
                     bodySize: 16
                 }
+            },
+            globalMicroInteractions: {
+                hover: '',
+                click: '',
+                scroll: ''
             },
             history: {
                 past: [],
@@ -109,13 +117,43 @@ export const useBuilderStore = create<BuilderStore>()(
                         }
                     }
                 })
+            })),
+
+            applyGlobalMicroInteractions: (interactions: GlobalMicroInteractions) => set((state) => ({
+                blocks: state.blocks.map(block => {
+                    if (block.microInteractionsLocked) return block
+
+                    return {
+                        ...block,
+                        microInteractions: {
+                            hover: interactions.hover,
+                            click: interactions.click,
+                            scroll: interactions.scroll,
+                        }
+                    }
+                })
+            })),
+
+            applyBlockMicroInteractions: (id: string, interactions: Partial<BlockMicroInteractions>) => set((state) => ({
+                blocks: state.blocks.map(block => {
+                    if (block.id !== id) return block
+
+                    return {
+                        ...block,
+                        microInteractions: {
+                            ...block.microInteractions,
+                            ...interactions
+                        }
+                    }
+                })
             }))
         }),
         {
             name: 'linq-builder-storage',
             partialize: (state) => ({
                 blocks: state.blocks,
-                globalTheme: state.globalTheme
+                globalTheme: state.globalTheme,
+                globalMicroInteractions: state.globalMicroInteractions
             })
         }
     )
