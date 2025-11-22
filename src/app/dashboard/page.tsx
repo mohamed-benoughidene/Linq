@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Canvas } from "@/components/builder/Canvas"
 // import { ThemesSection } from "@/components/builder/ThemesSection"
-// import { HeaderActions } from "@/components/builder/HeaderActions"
+import { HeaderActions } from "@/components/builder/HeaderActions"
 // import { AutoSaveManager } from "@/components/builder/AutoSaveManager"
 
 export default function Page() {
@@ -55,7 +55,7 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
-          {/* <HeaderActions /> */}
+          <HeaderActions />
         </header>
         <div className="flex flex-1 overflow-hidden h-[calc(100vh-4rem)]">
           <div className="flex-1 overflow-y-auto bg-muted/10">

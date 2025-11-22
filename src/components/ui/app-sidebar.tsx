@@ -6,8 +6,6 @@ import {
   LifeBuoy,
   Send,
   PackagePlus,
-  Undo,
-  Redo,
 } from "lucide-react"
 
 import { NavSecondary } from "@/components/ui/nav-secondary"
@@ -30,7 +28,7 @@ import { BlockType, Block } from "@/types/builder"
 import { toast } from "sonner"
 import { ThemesSection } from "@/components/builder/ThemesSection"
 import { MicroInteractionsSection } from "@/components/builder/MicroInteractionsSection"
-import { Button } from "@/components/ui/button"
+
 const data = {
   user: {
     name: "shadcn",
@@ -51,15 +49,19 @@ const data = {
   ],
 }
 
+import { getContrastTextColor } from "@/lib/colorUtils"
+
 function createDefaultBlock(type: BlockType): Block {
+  const defaultBgColor = '#FFFFFF'
   return {
     id: crypto.randomUUID(),
     type,
     position: Date.now(),
-    content: type === 'image' ? 'https://via.placeholder.com/400x300' : '',
+    content: type === 'image' ? '' : '',
     styles: {
       fontSize: type === 'heading' ? 32 : 16,
-      color: '#000000',
+      color: getContrastTextColor(defaultBgColor),
+      backgroundColor: defaultBgColor,
       margin: 8,
       padding: 8,
     },
@@ -70,12 +72,18 @@ function createDefaultBlock(type: BlockType): Block {
     },
     themeLocked: false,
     microInteractionsLocked: false,
+    // Image block fields
+    imageUrl: type === 'image' ? '' : undefined,
+    imageDescription: type === 'image' ? '' : undefined,
+    // Link block fields
+    linkUrl: type === 'link' ? '' : undefined,
+    linkText: type === 'link' ? '' : undefined,
   }
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [addBlockModalOpen, setAddBlockModalOpen] = React.useState(false)
-  const { addBlock, undo, redo, history } = useBuilderStore()
+  const { addBlock } = useBuilderStore()
 
   const handleSelectBlock = (type: BlockType) => {
     const newBlock = createDefaultBlock(type)
@@ -88,6 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <>
       <Sidebar variant="inset" {...props}>
+        
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -104,30 +113,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-
-          {/* History Controls */}
-          <div className="flex items-center gap-2 px-2 py-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-8"
-              onClick={undo}
-              disabled={history.past.length === 0}
-            >
-              <Undo className="mr-2 h-3 w-3" />
-              Undo
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-8"
-              onClick={redo}
-              disabled={history.future.length === 0}
-            >
-              <Redo className="mr-2 h-3 w-3" />
-              Redo
-            </Button>
-          </div>
         </SidebarHeader>
         <SidebarContent>
           {/* Add Blocks Section */}

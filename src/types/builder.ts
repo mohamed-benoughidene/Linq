@@ -30,6 +30,12 @@ export type Block = {
     microInteractions: BlockMicroInteractions
     themeLocked: boolean
     microInteractionsLocked: boolean
+    // Image-specific fields
+    imageUrl?: string
+    imageDescription?: string
+    // Link-specific fields
+    linkUrl?: string
+    linkText?: string
 }
 
 export type GlobalTheme = {

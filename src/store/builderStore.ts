@@ -10,9 +10,16 @@ import { Block, GlobalTheme, GlobalMicroInteractions, BlockMicroInteractions, Hi
 interface BuilderStore {
     blocks: Block[]
     selectedBlockId: string | null
+    pageTitle: string
+    currentPageId: string | null
     globalTheme: GlobalTheme
     globalMicroInteractions: GlobalMicroInteractions
     history: HistoryState
+
+    // Page Management
+    setPageTitle: (title: string) => void
+    setCurrentPageId: (id: string | null) => void
+    saveToDatabase: () => Promise<boolean>
 
     // Block CRUD
     addBlock: (block: Block) => void
@@ -37,6 +44,8 @@ export const useBuilderStore = create<BuilderStore>()(
         (set, get) => ({
             blocks: [],
             selectedBlockId: null,
+            pageTitle: 'Untitled Page',
+            currentPageId: null,
             globalTheme: {
                 name: 'minimal',
                 colors: {
@@ -115,6 +124,17 @@ export const useBuilderStore = create<BuilderStore>()(
             }),
 
             selectBlock: (id: string | null) => set({ selectedBlockId: id }),
+
+            setPageTitle: (title: string) => set({ pageTitle: title }),
+
+            setCurrentPageId: (id: string | null) => set({ currentPageId: id }),
+
+            saveToDatabase: async () => {
+                // TODO: Implement actual database save logic
+                // For now, return true to indicate success
+                console.log('Saving to database...')
+                return true
+            },
 
             /**
              * Duplicates a block, assigning a new ID and position.

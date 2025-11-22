@@ -2,6 +2,7 @@
 
 import { Block } from '@/types/builder'
 import { cn } from '@/lib/utils'
+import { ImageIcon } from 'lucide-react'
 
 interface BlockRendererProps {
     block: Block
@@ -46,24 +47,48 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
                 </p>
             )
         case 'image':
+            // Use imageUrl if available, otherwise show placeholder
+            const hasImage = block.imageUrl && block.imageUrl.trim() !== ''
+
             return (
-                <img
-                    src={block.content || 'https://via.placeholder.com/400x300'}
-                    alt=""
-                    style={combinedStyles}
-                    className={className}
-                    onClick={onClick}
-                />
+                <div style={combinedStyles} className={className} onClick={onClick}>
+                    {hasImage ? (
+                        <img
+                            src={block.imageUrl}
+                            alt={block.imageDescription || ''}
+                            className="w-full h-auto object-cover"
+                        />
+                    ) : (
+                        // Skeleton placeholder when no image URL
+                        <div className="flex flex-col items-center justify-center bg-muted rounded-md border-2 border-dashed border-muted-foreground/20 p-8 min-h-[200px]">
+                            <ImageIcon className="h-12 w-12 text-muted-foreground/40 mb-2" />
+                            <p className="text-sm text-muted-foreground/60">No image URL</p>
+                            <p className="text-xs text-muted-foreground/40 mt-1">Click to add image</p>
+                        </div>
+                    )}
+                    {/* Show description only if it exists and has content */}
+                    {block.imageDescription && block.imageDescription.trim() !== '' && (
+                        <p className="text-sm text-muted-foreground mt-2">{block.imageDescription}</p>
+                    )}
+                </div>
             )
         case 'link':
+            // Use linkUrl and linkText if available
+            const url = block.linkUrl && block.linkUrl.trim() !== '' ? block.linkUrl : '#'
+            const linkDisplay = block.linkText && block.linkText.trim() !== '' ? block.linkText : (block.linkUrl || 'Link')
+
             return (
                 <a
-                    href={block.content || '#'}
+                    href={url}
                     style={combinedStyles}
                     className={className}
-                    onClick={onClick}
+                    onClick={(e) => {
+                        // Prevent navigation when editing
+                        e.preventDefault()
+                        onClick?.()
+                    }}
                 >
-                    {block.content || 'Link'}
+                    {linkDisplay}
                 </a>
             )
         default:
