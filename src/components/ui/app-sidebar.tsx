@@ -6,6 +6,8 @@ import {
   LifeBuoy,
   Send,
   PackagePlus,
+  Undo,
+  Redo,
 } from "lucide-react"
 
 import { NavSecondary } from "@/components/ui/nav-secondary"
@@ -20,6 +22,7 @@ import {
   SidebarMenuItem,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarRail,
 } from "@/components/ui/sidebar"
 import { AddBlockModal } from "@/components/builder/AddBlockModal"
 import { useBuilderStore } from "@/store/builderStore"
@@ -27,6 +30,7 @@ import { BlockType, Block } from "@/types/builder"
 import { toast } from "sonner"
 import { ThemesSection } from "@/components/builder/ThemesSection"
 import { MicroInteractionsSection } from "@/components/builder/MicroInteractionsSection"
+import { Button } from "@/components/ui/button"
 const data = {
   user: {
     name: "shadcn",
@@ -71,7 +75,7 @@ function createDefaultBlock(type: BlockType): Block {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [addBlockModalOpen, setAddBlockModalOpen] = React.useState(false)
-  const { addBlock } = useBuilderStore()
+  const { addBlock, undo, redo, history } = useBuilderStore()
 
   const handleSelectBlock = (type: BlockType) => {
     const newBlock = createDefaultBlock(type)
@@ -100,6 +104,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+
+          {/* History Controls */}
+          <div className="flex items-center gap-2 px-2 py-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8"
+              onClick={undo}
+              disabled={history.past.length === 0}
+            >
+              <Undo className="mr-2 h-3 w-3" />
+              Undo
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8"
+              onClick={redo}
+              disabled={history.future.length === 0}
+            >
+              <Redo className="mr-2 h-3 w-3" />
+              Redo
+            </Button>
+          </div>
         </SidebarHeader>
         <SidebarContent>
           {/* Add Blocks Section */}
