@@ -1,45 +1,49 @@
-'use client'
+'use client';
 
-import { useEffect, useRef } from 'react'
-import { useBuilderStore } from '@/store/builderStore'
-import { toast } from 'sonner'
+import { useEffect, useRef } from 'react';
+import { useBuilderStore } from '@/store/builderStore';
+import { toast } from 'sonner';
 
 export function AutoSaveManager() {
-    const saveToDatabase = useBuilderStore((state) => state.saveToDatabase)
-    const currentPageId = useBuilderStore((state) => state.currentPageId)
+    const saveToDatabase = useBuilderStore((state) => state.saveToDatabase);
+    const currentPageId = useBuilderStore((state) => state.currentPageId);
+    const blocks = useBuilderStore((state) => state.blocks);
+    const globalTheme = useBuilderStore((state) => state.globalTheme);
+    const pageTitle = useBuilderStore((state) => state.pageTitle);
 
-    // Use a ref to keep track of the latest saveToDatabase function and currentPageId
-    // without triggering the effect re-run
-    const paramsRef = useRef({ saveToDatabase, currentPageId })
+    // Use a ref to track if it's the initial mount to avoid saving on load
+    const isMounted = useRef(false);
+    // Debounce timer
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        paramsRef.current = { saveToDatabase, currentPageId }
-    }, [saveToDatabase, currentPageId])
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
 
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            const { saveToDatabase, currentPageId } = paramsRef.current
+        if (!currentPageId) return;
 
-            // Only auto-save if we have a current page ID (meaning it's already been saved once)
-            if (currentPageId) {
-                console.log('Auto-saving...')
-                try {
-                    const success = await saveToDatabase()
-                    if (success) {
-                        console.log('Auto-save successful')
-                        // Optional: show a subtle toast
-                        // toast.success('Auto-saved', { duration: 1000, position: 'bottom-right' })
-                    } else {
-                        console.error('Auto-save failed')
-                    }
-                } catch (error) {
-                    console.error('Auto-save error:', error)
-                }
+        // Clear existing timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        // Set new timeout for auto-save (e.g., 2 seconds after last change)
+        timeoutRef.current = setTimeout(async () => {
+            const success = await saveToDatabase();
+            if (!success) {
+                console.error('Auto-save failed');
+                // Optionally show a toast, but might be annoying if frequent
             }
-        }, 30000) // 30 seconds
+        }, 2000);
 
-        return () => clearInterval(interval)
-    }, [])
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [blocks, globalTheme, pageTitle, currentPageId, saveToDatabase]);
 
-    return null // This component renders nothing
+    return null;
 }

@@ -2,461 +2,421 @@
 description: Step-by-step protocol for AI assistants building the Linq builder. Enforces corrected plan compliance, mandatory 3-test validation (console+visual+persistence), responsive editing (Popover+Sheet), live preview vs apply button patterns, and dual lock
 ---
 
-# Builder Development Workflow
+# Linq Feature Expansion - Complete Workflow for AI Agents
 
-**Step-by-step protocol for AI assistants working on the Linq builder**
+**Last Updated:** November 27, 2025
 
----
+***
 
-## 📋 Pre-Implementation Checklist
+## 📋 Table of Contents
 
-Before starting ANY work, verify you have access to:
+1. [Mission & Context](#mission--context)
+2. [Current State Analysis](#current-state-analysis)
+3. [Architecture Overview](#architecture-overview)
+4. [Implementation Phases](#implementation-phases)
+5. [Development Workflow](#development-workflow)
+6. [Testing Protocol](#testing-protocol)
+7. [Code Patterns & Standards](#code-patterns--standards)
+8. [Security Requirements](#security-requirements)
 
-- [ ] `builder-context-for-ai-corrected.md` - Execution protocol, testing requirements, commit standards
-- [ ] `complete-implementation-plan-corrected.md` (Part 1) - Phases 0-4 detailed steps
-- [ ] `complete-implementation-plan-part2-corrected.md` (Part 2) - Phases 5-10 detailed steps
-- [ ] `instructions.md` - Technical standards and patterns
-- [ ] `migration-plan-correct-implementation.md` - If migrating from old plan
+***
 
----
+## 🎯 Mission & Context
 
-## 🔄 Standard Workflow (For Each Step)
+### What is Linq?
 
-### Step 1: Read Protocol
+Linq is a **link-in-bio page builder** that allows creators to:
+1. Build custom landing pages with a visual block editor
+2. Publish pages at `username.linq.io/page-slug` or custom domains
+3. Share their link-in-bio across social media platforms
 
-**Read `builder-context-for-ai-corrected.md` FIRST**
+### Current Status
 
-Extract:
-- ✅ 5 critical architectural decisions (responsive, live/apply, dual locks, debounce, auto-test)
-- ✅ 3-test requirement per step (console + visual + persistence)
-- ✅ Common gotchas to avoid
-- ✅ Commit message format
+✅ **COMPLETE:** Builder system (Phases 0-9)
+- Block-based editor with Heading, Paragraph, Image, Link blocks
+- Theme system with global/per-block application
+- Micro-interactions system (hover, click, scroll effects)
+- Undo/Redo with keyboard shortcuts
+- Auto-save and database persistence structure
+- Mobile-responsive editing (Sheet component)
 
-**Critical Reminders from Context:**
-- Users MUST be able to edit on mobile (Popover + Sheet)
-- CSS changes = LIVE preview, Themes/Interactions = APPLY button
-- Two independent locks: `themeLocked` + `microInteractionsLocked`
-- Content editing uses 500ms debounce
-- NEVER commit without passing all 3 tests
+❌ **CRITICAL GAP:** No public viewing or page management
+- Users cannot view published pages
+- No page list/management interface
+- No publish/unpublish workflow
+- Builder is not connected to page routing
 
-### Step 2: Locate Step Code
+**Your Mission:** Implement the missing features to make Linq a complete, usable product.
 
-**Read the appropriate plan file:**
+***
 
-- **Phases 0-4**: `complete-implementation-plan-corrected.md` (Part 1)
-- **Phases 5-10**: `complete-implementation-plan-part2-corrected.md` (Part 2)
-- **Migration**: `migration-plan-correct-implementation.md` (if applicable)
+## 🔍 Current State Analysis
 
-**Extract from step:**
-- What it does (description)
-- Which files to modify
-- Exact code to implement
-- Test procedures (3 tests)
-- Commit message
+### What Works (Don't Touch)
 
-### Step 3: Verify Standards
+✅ **Builder System** (`src/components/builder/`)
+- `Canvas.tsx` - Orchestrator component
+- `BlockRenderer.tsx` - Renders individual blocks
+- `BlockEditor.tsx` - Responsive edit interface (Sheet on mobile/desktop)
+- `ThemesSection.tsx` - Theme picker with Apply button
+- `MicroInteractionsSection.tsx` - Interaction controls
+- `AutoSaveManager.tsx` - 30-second auto-save
+- `HeaderActions.tsx` - Undo/Redo buttons
 
-**Read `instructions.md`**
+✅ **State Management** (`src/store/builderStore.ts`)
+- Zustand store with localStorage persistence
+- Block CRUD operations
+- Theme and micro-interaction application
+- History tracking (undo/redo)
+- Database save/load methods (exist but not fully integrated)
 
-Verify implementation matches:
-- ✅ Responsive editing pattern (Popover + Sheet)
-- ✅ Hybrid styling (inline for custom values, Tailwind for interactions)
-- ✅ TypeScript strictness (no `any` types)
-- ✅ Database operations (server actions only)
-- ✅ State management (Zustand store)
-- ✅ Debouncing pattern (500ms for content)
+✅ **Authentication & Security**
+- Secure signup with rate limiting (Upstash Redis)
+- Google OAuth integration
+- Email confirmation flow
+- User enumeration prevention
 
-### Step 4: Identify User's Request
+### What's Missing (Your Tasks)
 
-**Parse the user's message to determine:**
-- Which phase? (0-10)
-- Which step? (e.g., Phase 2, Step 2.3)
-- Migration or fresh implementation?
-- Any special requirements?
+❌ **Public Page Viewing**
+- No route to view published pages (`/[username]/[slug]`)
+- No public-facing component to render pages
+- No publish/unpublish system
 
-**Example User Requests:**
-```
-"Build Step 2.3" → Phases 0-4, Step 2.3
-"Continue with Phase 5" → Start Phase 5, Step 5.1
-"Migrate from old plan" → Use migration plan
-```
+❌ **Page Management**
+- Dashboard shows builder directly (should show page list)
+- No way to create multiple pages
+- No page list/grid view
+- No CRUD operations UI
 
-### Step 5: Implement the Step
+❌ **Database Integration**
+- Save/load methods exist in store but not connected to routes
+- No page loading on builder mount
+- Auto-save not triggered properly
+- No save status indicator
 
-**Follow this exact sequence:**
+❌ **Publishing Workflow**
+- No publish toggle
+- No share modal with copy link
+- No public URL generation
 
-1. **Announce what you're implementing**
-   ```
-   "Implementing Phase X, Step X.Y: [Description]
-   Files to modify: [list]"
-   ```
+❌ **SEO & Metadata**
+- No meta title/description fields
+- No Open Graph tags
+- No social share preview
 
-2. **Provide the exact code from plan**
-   - Copy code character-for-character from plan
-   - Include all imports
-   - Add comments explaining key parts
-   - Use correct types from `@/types/builder`
+***
 
-3. **Explain what the code does (ELI5 style)**
-   ```
-   "This code creates a responsive block editor:
-   - On desktop (≥768px): Shows popover on right
-   - On mobile (<768px): Shows drawer from bottom
-   - Detects window size and switches automatically"
-   ```
+## 🏗️ Architecture Overview
 
-### Step 6: Provide Testing Instructions
+### Tech Stack
 
-**Always provide ALL 3 tests from the plan:**
+- **Framework:** Next.js 15 App Router (TypeScript)
+- **Database:** Supabase (PostgreSQL + Auth + RLS)
+- **State:** Zustand with localStorage persistence
+- **UI:** shadcn/ui + Tailwind CSS v4
+- **Security:** Upstash Redis for rate limiting
 
-#### Test 1: Console Test
-```typescript
-// Copy exact console commands from plan step
-console.log(useBuilderStore.getState().blocks)
-// Expected: [exact expected output]
-```
+### Database Schema
 
-#### Test 2: Visual Test
-```
-Desktop:
-1. [Exact action]
-   → [Expected result]
+```sql
+-- ✅ EXISTS
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users,
+  username TEXT UNIQUE NOT NULL,
+  full_name TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-Mobile:
-1. [Exact action]
-   → [Expected result]
-```
+-- ✅ EXISTS
+CREATE TABLE pages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) NOT NULL,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  blocks JSONB DEFAULT '[]'::jsonb,
+  is_published BOOLEAN DEFAULT false,
+  seo_title TEXT,
+  seo_description TEXT,
+  seo_image TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, slug)
+);
 
-#### Test 3: Persistence Test
-```
-1. [Action]
-2. Refresh page
-3. [Expected result]
-```
-
-### Step 7: Provide Commit Message
-
-**Copy exact commit message from plan:**
-
-```bash
-git add .
-git commit -m "feat: make block editor responsive (popover + sheet)"
-```
-
-### Step 8: Confirm Understanding
-
-**Ask user to confirm:**
-
-```
-"I've provided the code for Step X.Y. 
-
-Before moving to the next step:
-1. ✅ Run Test 1 (Console) - Verify state
-2. ✅ Run Test 2 (Visual) - Verify UI on desktop AND mobile
-3. ✅ Run Test 3 (Persistence) - Refresh and verify data persists
-
-Once all 3 tests pass, commit with the message above.
-
-Ready for the next step, or do you need help with testing?"
+-- ❓ VERIFY EXISTENCE
+CREATE TABLE domains (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) NOT NULL,
+  page_id UUID REFERENCES pages(id),
+  domain TEXT UNIQUE NOT NULL,
+  verified BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
----
+### Required RLS Policies
 
-## 🧪 Testing Protocol (MANDATORY)
+```sql
+-- Public read: only published pages
+CREATE POLICY "Public pages are viewable by everyone"
+  ON pages FOR SELECT
+  USING (is_published = true);
 
-### Never Skip Testing
+-- Owner full access
+CREATE POLICY "Users can manage own pages"
+  ON pages FOR ALL
+  USING (auth.uid() = user_id);
 
-**Every step MUST pass all 3 tests before committing.**
+-- Profiles are public
+CREATE POLICY "Profiles are viewable by everyone"
+  ON profiles FOR SELECT
+  USING (true);
 
-### Test Execution Order
-
-```
-1. Implement code
-2. Save files
-3. Run Test 1 (Console)
-   ├─ Pass? → Continue
-   └─ Fail? → Debug, fix, re-test
-4. Run Test 2 (Visual)
-   ├─ Desktop test
-   ├─ Mobile test
-   ├─ Pass? → Continue
-   └─ Fail? → Debug, fix, re-test
-5. Run Test 3 (Persistence)
-   ├─ Pass? → Continue
-   └─ Fail? → Debug, fix, re-test
-6. All pass? → Commit
-7. Any fail? → Do NOT commit, debug first
+-- Users update own profile
+CREATE POLICY "Users update own profile"
+  ON profiles FOR UPDATE
+  USING (auth.uid() = id);
 ```
 
-### When Tests Fail
-
-**Ask user:**
-```
-"Which test failed?
-1. Console test - What did the console show?
-2. Visual test - What happened vs what was expected?
-3. Persistence test - What data didn't persist?
-
-Please provide the exact error or unexpected behavior."
-```
-
-**Then debug step-by-step:**
-- Check TypeScript errors
-- Check console errors
-- Verify imports
-- Verify file paths
-- Compare code with plan character-by-character
-- Check for typos
-
----
-
-## 🚨 Critical Validation Checks
-
-### Before Providing Code
-
-- [ ] Is this the corrected plan (not old plan)?
-- [ ] Does BlockEditor use Popover + Sheet (not just Popover)?
-- [ ] Do CSS changes update instantly (no apply button)?
-- [ ] Do themes/interactions require Apply button click?
-- [ ] Does Block type have BOTH locks?
-- [ ] Does content editing use 500ms debounce?
-- [ ] Are all types properly defined (no `any`)?
-- [ ] Are database operations server actions?
-
-### After Providing Code
-
-- [ ] Did I provide exact code from corrected plan?
-- [ ] Did I include all 3 tests?
-- [ ] Did I provide exact commit message?
-- [ ] Did I explain what the code does?
-- [ ] Did I remind about testing before committing?
-
----
-
-## 🔀 Migration Workflow (If Applicable)
-
-**When user says "agent already started old plan":**
-
-### Step M1: Assess Current State
+### File Structure
 
 ```
-"Let me check the current implementation state.
-
-Can you provide:
-1. Which phases/steps have been completed?
-2. Which files exist in these directories:
-   - src/components/builder/
-   - src/components/sidebar/
-   - src/store/
-   - src/types/
-3. Output of: git log --oneline --decorate (last 10 commits)"
+src/
+├── app/
+│   ├── dashboard/
+│   │   ├── page.tsx              # ❌ NEEDS UPDATE: Currently shows builder, needs page list
+│   │   └── pages/                # ❌ NEW: Page-specific routes
+│   │       ├── page.tsx          # ❌ NEW: List of user's pages
+│   │       ├── new/
+│   │       │   └── page.tsx      # ❌ NEW: Create new page flow
+│   │       └── [id]/
+│   │           └── page.tsx      # ❌ NEW: Builder (move current dashboard here)
+│   │
+│   ├── [username]/               # ❌ NEW: Public routes
+│   │   └── [slug]/
+│   │       └── page.tsx          # ❌ NEW: Public page view
+│   │
+│   └── actions/
+│       ├── auth.ts               # ✅ EXISTS
+│       └── pages.ts              # ✅ EXISTS but needs full CRUD
+│
+├── components/
+│   ├── builder/                  # ✅ COMPLETE - Don't modify
+│   │   ├── Canvas.tsx
+│   │   ├── BlockRenderer.tsx
+│   │   ├── BlockEditor.tsx
+│   │   ├── ThemesSection.tsx
+│   │   ├── MicroInteractionsSection.tsx
+│   │   ├── AutoSaveManager.tsx
+│   │   └── HeaderActions.tsx
+│   │
+│   ├── dashboard/                # ❌ NEW: Page management UI
+│   │   ├── PagesList.tsx         # ❌ NEW: Grid/list of pages
+│   │   ├── PageCard.tsx          # ❌ NEW: Individual page card
+│   │   └── PageSetupForm.tsx     # ❌ NEW: Create page form
+│   │
+│   └── public/                   # ❌ NEW: Public viewing
+│       └── PublicPageRenderer.tsx # ❌ NEW: Read-only page renderer
+│
+├── store/
+│   └── builderStore.ts           # ✅ COMPLETE - Minor updates needed
+│
+├── types/
+│   ├── builder.ts                # ✅ COMPLETE
+│   └── database.ts               # ⚠️ NEEDS UPDATE: Add Page type with SEO
+│
+└── lib/
+    └── themes.ts                 # ✅ COMPLETE
 ```
 
-### Step M2: Use Migration Plan
+***
 
-**Follow `migration-plan-correct-implementation.md`:**
+## 🚀 Implementation Phases
 
-1. Read migration steps M1-M10
-2. Identify which steps apply
-3. Implement corrections sequentially
-4. Test each correction (3 tests)
-5. Commit each correction
+### Phase 1: Public Page Viewing (CRITICAL - MVP Blocker) 🔥
 
-**Migration steps correct:**
-- Add `microInteractionsLocked` to types
-- Add `globalMicroInteractions` to store
-- Install Sheet component
-- Make BlockEditor responsive
-- Add Apply buttons to themes/interactions
-- Emphasize debouncing
+**Goal:** Users can share and view their published pages publicly.
 
-### Step M3: Resume Normal Workflow
+**Why Critical:** This is the core value proposition. Without it, Linq is useless.
 
-**After migration complete:**
+#### Step 1.1: Create Public Page Route
 
-Resume with corrected plan from appropriate phase.
+**Files to create/modify:**
+- `src/app/[username]/[slug]/page.tsx` (NEW)
+- `src/components/public/PublicPageRenderer.tsx` (NEW)
+- `src/types/database.ts` (UPDATE)
 
----
-
-## 💡 Response Templates
-
-### Starting a Step
-
-```markdown
-## Implementing Phase X, Step X.Y: [Description]
-
-**What**: [One-sentence summary]
-**Files**: [List of files to modify]
-
-### Code
+**Implementation:**
 
 ```typescript
-[Exact code from plan]
+// src/app/[username]/[slug]/page.tsx
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
+import { PublicPageRenderer } from '@/components/public/PublicPageRenderer';
+
+interface PageProps {
+  params: {
+    username: string;
+    slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const supabase = await createClient();
+  
+  const { data: page } = await supabase
+    .from('pages')
+    .select('*, profiles!inner(username)')
+    .eq('profiles.username', params.username)
+    .eq('slug', params.slug)
+    .eq('is_published', true)
+    .single();
+
+  if (!page) {
+    return {
+      title: 'Page Not Found',
+    };
+  }
+
+  return {
+    title: page.seo_title || page.title,
+    description: page.seo_description || `${page.title} - Linq`,
+    openGraph: {
+      title: page.seo_title || page.title,
+      description: page.seo_description || `${page.title} - Linq`,
+      images: page.seo_image ? [page.seo_image] : [],
+    },
+  };
+}
+
+export default async function PublicPage({ params }: PageProps) {
+  const supabase = await createClient();
+  
+  // Fetch page with profile info
+  const { data: page, error } = await supabase
+    .from('pages')
+    .select('*, profiles!inner(username, full_name, avatar_url)')
+    .eq('profiles.username', params.username)
+    .eq('slug', params.slug)
+    .eq('is_published', true)
+    .single();
+
+  if (error || !page) {
+    notFound();
+  }
+
+  return <PublicPageRenderer page={page} />;
+}
 ```
 
-### Explanation
-
-[ELI5 explanation of what this does]
-
-### Testing
-
-**Test 1: Console**
 ```typescript
-[Console commands]
-// Expected: [output]
-```
+// src/components/public/PublicPageRenderer.tsx
+'use client';
 
-**Test 2: Visual**
-```
-Desktop:
-- [Action] → [Result]
+import { Block } from '@/types/builder';
+import { cn } from '@/lib/utils';
 
-Mobile:
-- [Action] → [Result]
-```
+interface PublicPageRendererProps {
+  page: {
+    title: string;
+    blocks: Block[];
+    profiles: {
+      username: string;
+      full_name: string | null;
+      avatar_url: string | null;
+    };
+  };
+}
 
-**Test 3: Persistence**
-```
-1. [Action]
-2. Refresh
-3. Expected: [Result]
-```
+export function PublicPageRenderer({ page }: PublicPageRendererProps) {
+  const { blocks } = page;
 
-### Commit
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header with user info */}
+      <header className="border-b">
+        <div className="container max-w-4xl mx-auto py-6 px-4">
+          <div className="flex items-center gap-4">
+            {page.profiles.avatar_url && (
+              <img
+                src={page.profiles.avatar_url}
+                alt={page.profiles.full_name || page.profiles.username}
+                className="w-16 h-16 rounded-full"
+              />
+            )}
+            <div>
+              <h1 className="text-2xl font-bold">{page.title}</h1>
+              <p className="text-muted-foreground">
+                @{page.profiles.username}
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
 
-```bash
-git add .
-git commit -m "[exact message from plan]"
-```
+      {/* Blocks */}
+      <main className="container max-w-4xl mx-auto py-8 px-4">
+        <div className="space-y-4">
+          {blocks.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              This page is empty.
+            </p>
+          ) : (
+            blocks.map((block) => (
+              <PublicBlockRenderer key={block.id} block={block} />
+            ))
+          )}
+        </div>
+      </main>
 
----
+      {/* Footer */}
+      <footer className="border-t mt-16">
+        <div className="container max-w-4xl mx-auto py-6 px-4 text-center text-sm text-muted-foreground">
+          <p>
+            Made with <a href="/" className="underline">Linq</a>
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
 
-**Ready for next step? Run all 3 tests first, then let me know!**
-```
+function PublicBlockRenderer({ block }: { block: Block }) {
+  // Hybrid styling: inline for custom values
+  const combinedStyles = {
+    fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
+    color: block.styles.color,
+    backgroundColor: block.styles.backgroundColor,
+    fontFamily: block.styles.fontFamily,
+    fontWeight: block.styles.fontWeight,
+    margin: block.styles.margin ? `${block.styles.margin}px` : undefined,
+    padding: block.styles.padding ? `${block.styles.padding}px` : undefined,
+    borderWidth: block.styles.borderWidth ? `${block.styles.borderWidth}px` : undefined,
+    borderColor: block.styles.borderColor,
+    borderRadius: block.styles.borderRadius ? `${block.styles.borderRadius}px` : undefined,
+    borderStyle: block.styles.borderWidth ? 'solid' : undefined,
+  };
 
-### When User Reports Test Failure
+  // Tailwind classes for micro-interactions
+  const className = cn(
+    block.microInteractions.hover,
+    block.microInteractions.click,
+    block.microInteractions.scroll,
+    'transition-all'
+  );
 
-```markdown
-Let me help debug this.
-
-**Which test failed?**
-- [ ] Test 1 (Console)
-- [ ] Test 2 (Visual)
-- [ ] Test 3 (Persistence)
-
-**What happened?**
-[Wait for user response]
-
-**What was expected?**
-[From plan]
-
-**Common causes:**
-1. [List relevant gotchas from instructions]
-2. [Suggest checks]
-
-Let's debug step by step...
-```
-
-### When User Asks to Skip Testing
-
-```markdown
-⚠️ **Testing is mandatory - we cannot skip.**
-
-Here's why:
-1. **Prevents bugs** - Catches issues immediately
-2. **Validates implementation** - Ensures code works as planned
-3. **Maintains quality** - Each step builds on previous
-4. **Saves time** - Debugging later is harder
-
-The 3 tests take ~2 minutes total. Debugging broken code later takes 30+ minutes.
-
-**Let's run the tests:**
-[Provide test instructions again]
-```
-
----
-
-## 🎯 Quality Checklist
-
-### Before Saying "Step Complete"
-
-- [ ] Code matches corrected plan exactly
-- [ ] All 3 tests provided with expected results
-- [ ] Commit message provided
-- [ ] Explanation provided (ELI5)
-- [ ] User reminded to test before committing
-- [ ] No old plan patterns used
-- [ ] No assumptions or improvisations
-
-### Red Flags (Never Do This)
-
-- ❌ Providing code without tests
-- ❌ Saying "skip testing, it's simple"
-- ❌ Using old plan patterns (desktop-only, auto-apply, single lock)
-- ❌ Combining multiple steps
-- ❌ Improvising code not in plan
-- ❌ Using `any` types
-- ❌ Suggesting client-side database operations
-
----
-
-## 📚 Quick Reference Hierarchy
-
-**When implementing, check in this order:**
-
-1. **builder-context-for-ai-corrected.md** - Protocol & critical decisions
-2. **Appropriate plan file** - Exact code for the step
-3. **instructions-corrected.md** - Technical patterns & standards
-4. **migration-plan** - Only if migrating from old plan
-
-**When debugging:**
-
-1. **Instructions** - Common mistakes section
-2. **Context** - Gotchas section
-3. **Plan** - Expected behavior from step
-4. **User's error** - Actual vs expected
-
----
-
-## 🚀 Success Metrics
-
-### Step is Complete When:
-
-✅ Code implemented matches plan exactly  
-✅ User confirmed Test 1 passed (console)  
-✅ User confirmed Test 2 passed (visual on desktop + mobile)  
-✅ User confirmed Test 3 passed (persistence)  
-✅ User committed with exact message from plan  
-✅ Ready to move to next step  
-
-### Phase is Complete When:
-
-✅ All steps in phase completed  
-✅ All tests passed for all steps  
-✅ All commits made  
-✅ User ready for next phase  
-
----
-
-## 📖 Summary
-
-**For every step requested:**
-
-1. ✅ Read context (protocol & testing)
-2. ✅ Read plan (exact code & tests)
-3. ✅ Read instructions (verify standards)
-4. ✅ Identify user's specific step
-5. ✅ Implement strictly following protocol:
-   - Provide exact code from plan
-   - Explain what it does
-   - Provide all 3 tests
-   - Provide commit message
-   - Remind to test before committing
-6. ✅ Validate before responding (no old patterns)
-7. ✅ Confirm understanding with user
-
-**Never skip testing. Never use old plan. Never improvise. Always follow corrected plan exactly.**
-
----
-
-**When in doubt, ask Mohamed. When still in doubt, check the corrected plan. Never guess.** 🎯
+  switch (block.type) {
+    case 'heading':
+      return (
+        <h1 style={combinedStyles} className={className}>
+          {block.content || 'Heading'}
+        </h1>
+      );
+    case 'paragraph':
+      return (
+        <p style={combinedStyles} className={className}>
+          {block.content || 'Paragraph'}
+        </p>

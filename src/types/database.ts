@@ -27,3 +27,11 @@ export interface UpdatePageInput {
     global_theme?: GlobalTheme
     is_published?: boolean
 }
+
+export interface PageWithProfile extends PageRecord {
+    profiles: {
+        username: string
+        full_name: string | null
+        avatar_url: string | null
+    }
+}

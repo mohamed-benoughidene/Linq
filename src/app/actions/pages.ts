@@ -138,3 +138,80 @@ export async function deletePage(pageId: string) {
         return { success: false, error: 'Server error' }
     }
 }
+
+export async function togglePublishStatus(pageId: string, isPublished: boolean) {
+    try {
+        const supabase = await createClient()
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError || !user) {
+            return { success: false, error: 'Not authenticated' }
+        }
+
+        const { data: page, error } = await supabase
+            .from('pages')
+            .update({ is_published: isPublished })
+            .eq('id', pageId)
+            .eq('user_id', user.id)
+            .select()
+            .single()
+
+        if (error) {
+            console.error('Error toggling publish status:', error)
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/dashboard')
+        revalidatePath(`/dashboard/pages/${pageId}`)
+        return { success: true, data: page as PageRecord }
+    } catch (error) {
+        console.error('Server error in togglePublishStatus:', error)
+        return { success: false, error: 'Server error' }
+    }
+}
+
+export async function createPage(title: string, slug: string) {
+    try {
+        const supabase = await createClient()
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError || !user) {
+            return { success: false, error: 'Not authenticated' }
+        }
+
+        // Check slug uniqueness
+        const { data: existing } = await supabase
+            .from('pages')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('slug', slug)
+            .single()
+
+        if (existing) {
+            return { success: false, error: 'A page with this URL already exists' }
+        }
+
+        const { data: page, error } = await supabase
+            .from('pages')
+            .insert({
+                user_id: user.id,
+                title,
+                slug,
+                blocks: [],
+                is_published: false,
+            })
+            .select()
+            .single()
+
+        if (error) {
+            console.error('Error creating page:', error)
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/dashboard')
+        return { success: true, pageId: page.id }
+    } catch (error) {
+        console.error('Server error in createPage:', error)
+        return { success: false, error: 'Server error' }
+    }
+}

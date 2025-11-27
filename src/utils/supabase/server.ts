@@ -9,11 +9,14 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      db: {
+        schema: 'linq_db',
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           try {
             console.log("Setting cookies:", cookiesToSet.map(c => c.name).join(', '));
             cookiesToSet.forEach(({ name, value, options }) =>

@@ -601,7 +601,7 @@ setCurrentPageId(id: string | null)
 setPageTitle(title: string)
 ```
 
-### Completed Features (Phase 0-9)
+### Completed Features (Phase 0-10)
 
 - ✅ Block creation (Heading, Paragraph, Image, Link)
 - ✅ Block selection with visual indicators
@@ -617,11 +617,14 @@ setPageTitle(title: string)
 - ✅ Database Persistence (Save/Load + Auto-save)
 - ✅ Undo/Redo System (with keyboard shortcuts)
 - ✅ localStorage persistence
+- ✅ Public Page Viewing (`/[username]/[slug]`)
+- ✅ Page Management Dashboard (List, Create, Delete)
 
-### Pending Features (Phase 10+)
+### Pending Features (Phase 11+)
 
 - Export functionality (HTML/JSON)
-- Public view page (rendering pages via slug)
+- Analytics (Page views, link clicks)
+- Custom Domain Mapping
 
 ---
 
@@ -657,6 +660,10 @@ When deploying to production (Vercel):
    - Site URL: `https://yourdomain.com`
    - Redirect URLs: Add `https://yourdomain.com/**`
 
+7. ✅ **Configure Supabase Schema:**
+   - Ensure `linq_db` is added to "Exposed schemas" in Supabase Settings -> API.
+   - Run the schema migration SQL to create tables in `linq_db` and set permissions.
+
 ## Troubleshooting
 
 ### "JSON.parse error" on signup
@@ -687,11 +694,20 @@ When deploying to production (Vercel):
 **Cause:** Callback route not handling code exchange  
 **Fix:** Check `src/app/auth/callback/route.ts` exists and logs
 
+### "Schema must be one of the following: api"
+**Cause:** Supabase API not configured to expose `linq_db` schema  
+**Fix:** Go to Supabase Settings -> API -> Exposed schemas and add `linq_db`.
+
+### 404 on Public Page
+**Cause:** Page is draft or missing profile data  
+**Fix:** Publish the page in the builder. Ensure `profiles` table has `username` populated.
+
 ## Next steps / TODO ideas
 
 - ✅ ~~Implement secure signup with rate limiting~~ (DONE)
 - ✅ ~~Add Google OAuth for login and signup~~ (DONE)
 - ✅ ~~Implement block-based page builder (Phase 0-9)~~ (DONE)
+- ✅ ~~Implement Public Pages & Dashboard~~ (DONE)
 - Add rate limiting to login endpoint
 - Add rate limiting to password reset
 - Add drag-n-drop block reordering
@@ -703,6 +719,20 @@ When deploying to production (Vercel):
 ---
 
 **Recent Updates:**
+
+### Public Pages & Dashboard (Phase 10)
+- **Public Page Route**: `/[username]/[slug]` renders published pages with SEO metadata.
+- **Dashboard**: List view of pages, create new page flow, delete page functionality.
+- **Persistence**: Auto-save (debounced) and manual save with status indicators.
+- **Database Schema**:
+    - Moved all tables (`pages`, `blocks`, `profiles`) to `linq_db` schema.
+    - Added `username`, `full_name`, `avatar_url` to `profiles`.
+    - Linked `pages.user_id` to `profiles.id` via Foreign Key.
+    - Updated RLS policies for public access.
+- **Builder Enhancements**:
+    - Publish/Unpublish toggle.
+    - Header actions (Save, Undo, Redo).
+    - Auto-save integration.
 
 ### Builder System Implementation (Phase 0-9)
 - **Phase 0 - Foundation**: Set up Zustand state management, Sonner toasts, and TypeScript types for blocks

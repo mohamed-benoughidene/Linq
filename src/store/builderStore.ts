@@ -3,6 +3,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Block, GlobalTheme, GlobalMicroInteractions, BlockMicroInteractions, HistoryState } from '@/types/builder'
 
+import { savePage } from '@/app/actions/pages'
+
 /**
  * Main state interface for the page builder.
  * Manages blocks, selection, global settings, and undo/redo history.
@@ -15,6 +17,8 @@ interface BuilderStore {
     globalTheme: GlobalTheme
     globalMicroInteractions: GlobalMicroInteractions
     history: HistoryState
+    isSaving: boolean
+    lastSaved: Date | null
 
     // Page Management
     setPageTitle: (title: string) => void
@@ -70,6 +74,8 @@ export const useBuilderStore = create<BuilderStore>()(
                 present: [],
                 future: []
             },
+            isSaving: false,
+            lastSaved: null,
 
             /**
              * Adds a new block to the canvas and records history.
@@ -130,10 +136,25 @@ export const useBuilderStore = create<BuilderStore>()(
             setCurrentPageId: (id: string | null) => set({ currentPageId: id }),
 
             saveToDatabase: async () => {
-                // TODO: Implement actual database save logic
-                // For now, return true to indicate success
-                console.log('Saving to database...')
-                return true
+                const state = get()
+                if (!state.currentPageId) return false
+
+                set({ isSaving: true })
+
+                const result = await savePage(state.currentPageId, {
+                    title: state.pageTitle,
+                    blocks: state.blocks,
+                    global_theme: state.globalTheme,
+                })
+
+                set({ isSaving: false })
+
+                if (result.success) {
+                    set({ lastSaved: new Date() })
+                    return true
+                }
+
+                return false
             },
 
             /**

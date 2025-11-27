@@ -1,68 +1,34 @@
-'use client'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
+import { PagesList } from '@/components/dashboard/PagesList'
 
-import { useEffect } from 'react'
-import { useBuilderStore } from '@/store/builderStore'
-import { AppSidebar } from "@/components/ui/app-sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Canvas } from "@/components/builder/Canvas"
-// import { ThemesSection } from "@/components/builder/ThemesSection"
-import { HeaderActions } from "@/components/builder/HeaderActions"
-// import { AutoSaveManager } from "@/components/builder/AutoSaveManager"
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-export default function Page() {
-  // const undo = useBuilderStore((state) => state.undo)
-  // const redo = useBuilderStore((state) => state.redo)
+  if (!user) redirect('/login')
 
-  // useEffect(() => {
-  //   const handleKeyDown = (e: KeyboardEvent) => {
-  //     if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
-  //       e.preventDefault()
-  //       if (e.shiftKey) {
-  //         redo()
-  //       } else {
-  //         undo()
-  //       }
-  //     }
-  //   }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', user.id)
+    .single()
 
-  //   window.addEventListener('keydown', handleKeyDown)
-  //   return () => window.removeEventListener('keydown', handleKeyDown)
-  // }, [undo, redo])
+  const { data: pages } = await supabase
+    .from('pages')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false })
 
   return (
-    <SidebarProvider>
-      {/* <AutoSaveManager /> */}
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-          </div>
-          <HeaderActions />
-        </header>
-        <div className="flex flex-1 overflow-hidden h-[calc(100vh-4rem)]">
-          <div className="flex-1 overflow-y-auto bg-muted/10">
-            <Canvas />
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Your Pages</h1>
+        <p className="text-muted-foreground mt-2">
+          Create and manage your link-in-bio pages
+        </p>
+      </div>
+      <PagesList pages={pages || []} username={profile?.username || 'user'} />
+    </div>
   )
 }
