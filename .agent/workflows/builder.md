@@ -56,7 +56,7 @@ Extract:
 
 ### Step 3: Verify Standards
 
-**Read `instructions-corrected.md`**
+**Read `instructions.md`**
 
 Verify implementation matches:
 - ✅ Responsive editing pattern (Popover + Sheet)

@@ -107,14 +107,16 @@ src/
   types/                — ⭐ NEW: TypeScript type definitions
     builder.ts          — Block, theme, and history types
 
-  utils/supabase/
+    utils/supabase/
     client.ts           — supabase client factory (use client for browser)
     server.ts           — server-side supabase helpers
     middleware.ts       — supabase-related middleware helpers
+
+  middleware.ts         — ⭐ MOVED: Root middleware (now in src/)
 ```
 
 
-Top-level files: `middleware.ts`, `next.config.ts`, `package.json`, `tsconfig.json`.
+Top-level files: `next.config.ts`, `package.json`, `tsconfig.json`.
 
 ## Form UX Features
 
@@ -438,6 +440,12 @@ return NextResponse.json({
   2. Google OAuth: Uses server action (`signInWithGoogle`) and callback route
 - Protected API routes live under `src/app/api/protected/route.ts` and similar.
 - Session refresh / Host-based routing logic can be found in the root `middleware.ts` and `src/utils/supabase/middleware.ts`.
+
+## Logout Functionality
+- Server action: `src/app/actions/auth.ts` - `signOut()`
+- Components: `LogoutButton`, `NavUser` dropdown
+- Flow: Click logout → Server action clears session → Revalidate cache → Redirect to login
+- Security: Uses server-side session clearing (not client-side only)
 
 ## Common gotchas & tips
 

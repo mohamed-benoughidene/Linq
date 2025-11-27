@@ -14,6 +14,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import { signOut } from "@/app/actions/auth"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,7 +103,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={async () => {
+              try {
+                await signOut()
+              } catch (error) {
+                console.error('Logout failed:', error)
+              }
+            }}>
               <LogOut />
               Log out
             </DropdownMenuItem>
