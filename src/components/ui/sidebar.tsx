@@ -7,6 +7,7 @@ import { PanelLeftIcon } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { useComponentId } from "@/lib/component-id"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -131,6 +132,7 @@ function SidebarProvider({
       <TooltipProvider delayDuration={0}>
         <div
           data-slot="sidebar-wrapper"
+          data-component-id={useComponentId("SidebarWrapper")}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH,
@@ -169,6 +171,7 @@ function Sidebar({
     return (
       <div
         data-slot="sidebar"
+        data-component-id={useComponentId("Sidebar")}
         className={cn(
           "bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
           className
@@ -213,6 +216,7 @@ function Sidebar({
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
+      data-component-id={useComponentId("Sidebar")}
     >
       {/* This is what handles the sidebar gap on desktop */}
       <div
@@ -264,6 +268,7 @@ function SidebarTrigger({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
+      data-component-id={useComponentId("SidebarTrigger")}
       variant="ghost"
       size="icon"
       className={cn("size-7", className)}
@@ -286,6 +291,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
+      data-component-id={useComponentId("SidebarRail")}
       aria-label="Toggle Sidebar"
       tabIndex={-1}
       onClick={toggleSidebar}
@@ -308,6 +314,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
   return (
     <main
       data-slot="sidebar-inset"
+      data-component-id={useComponentId("SidebarInset")}
       className={cn(
         "bg-background relative flex w-full flex-1 flex-col",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
@@ -326,6 +333,7 @@ function SidebarInput({
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
+      data-component-id={useComponentId("SidebarInput")}
       className={cn("bg-background h-8 w-full shadow-none", className)}
       {...props}
     />
@@ -337,6 +345,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
+      data-component-id={useComponentId("SidebarHeader")}
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     />
@@ -348,6 +357,7 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
+      data-component-id={useComponentId("SidebarFooter")}
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     />
@@ -362,6 +372,7 @@ function SidebarSeparator({
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
+      data-component-id={useComponentId("SidebarSeparator")}
       className={cn("bg-sidebar-border mx-2 w-auto", className)}
       {...props}
     />
@@ -373,6 +384,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-content"
       data-sidebar="content"
+      data-component-id={useComponentId("SidebarContent")}
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
         className
@@ -387,6 +399,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
+      data-component-id={useComponentId("SidebarGroup")}
       className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
       {...props}
     />
@@ -404,6 +417,7 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
+      data-component-id={useComponentId("SidebarGroupLabel")}
       className={cn(
         "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
@@ -425,6 +439,7 @@ function SidebarGroupAction({
     <Comp
       data-slot="sidebar-group-action"
       data-sidebar="group-action"
+      data-component-id={useComponentId("SidebarGroupAction")}
       className={cn(
         "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         // Increases the hit area of the button on mobile.
@@ -445,6 +460,7 @@ function SidebarGroupContent({
     <div
       data-slot="sidebar-group-content"
       data-sidebar="group-content"
+      data-component-id={useComponentId("SidebarGroupContent")}
       className={cn("w-full text-sm", className)}
       {...props}
     />
@@ -456,6 +472,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
+      data-component-id={useComponentId("SidebarMenu")}
       className={cn("flex w-full min-w-0 flex-col gap-1", className)}
       {...props}
     />
@@ -467,6 +484,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
     <li
       data-slot="sidebar-menu-item"
       data-sidebar="menu-item"
+      data-component-id={useComponentId("SidebarMenuItem")}
       className={cn("group/menu-item relative", className)}
       {...props}
     />
@@ -515,6 +533,7 @@ function SidebarMenuButton({
     <Comp
       data-slot="sidebar-menu-button"
       data-sidebar="menu-button"
+      data-component-id={useComponentId("SidebarMenuButton")}
       data-size={size}
       data-active={isActive}
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
@@ -560,6 +579,7 @@ function SidebarMenuAction({
     <Comp
       data-slot="sidebar-menu-action"
       data-sidebar="menu-action"
+      data-component-id={useComponentId("SidebarMenuAction")}
       className={cn(
         "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground peer-hover/menu-button:text-sidebar-accent-foreground absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         // Increases the hit area of the button on mobile.
@@ -569,7 +589,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className
       )}
       {...props}
@@ -585,6 +605,7 @@ function SidebarMenuBadge({
     <div
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
+      data-component-id={useComponentId("SidebarMenuBadge")}
       className={cn(
         "text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums select-none",
         "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
@@ -615,6 +636,7 @@ function SidebarMenuSkeleton({
     <div
       data-slot="sidebar-menu-skeleton"
       data-sidebar="menu-skeleton"
+      data-component-id={useComponentId("SidebarMenuSkeleton")}
       className={cn("flex h-8 items-center gap-2 rounded-md px-2", className)}
       {...props}
     >
@@ -642,6 +664,7 @@ function SidebarMenuSub({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
+      data-component-id={useComponentId("SidebarMenuSub")}
       className={cn(
         "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5",
         "group-data-[collapsible=icon]:hidden",
@@ -660,6 +683,7 @@ function SidebarMenuSubItem({
     <li
       data-slot="sidebar-menu-sub-item"
       data-sidebar="menu-sub-item"
+      data-component-id={useComponentId("SidebarMenuSubItem")}
       className={cn("group/menu-sub-item relative", className)}
       {...props}
     />
@@ -683,6 +707,7 @@ function SidebarMenuSubButton({
     <Comp
       data-slot="sidebar-menu-sub-button"
       data-sidebar="menu-sub-button"
+      data-component-id={useComponentId("SidebarMenuSubButton")}
       data-size={size}
       data-active={isActive}
       className={cn(

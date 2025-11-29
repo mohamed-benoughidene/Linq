@@ -3,14 +3,16 @@
 import { Block } from '@/types/builder';
 import { cn } from '@/lib/utils';
 import { PageWithProfile } from '@/types/database';
+import { useComponentId } from '@/lib/component-id';
 
 interface PublicPageRendererProps {
     page: PageWithProfile;
 }
 
 export function PublicPageRenderer({ page }: PublicPageRendererProps) {
+    const componentId = useComponentId("PublicPageRenderer")
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background" data-component-id={componentId}>
             {/* Header */}
             <header className="border-b">
                 <div className="container max-w-4xl mx-auto py-6 px-4">
@@ -54,6 +56,7 @@ export function PublicPageRenderer({ page }: PublicPageRendererProps) {
 }
 
 function PublicBlockRenderer({ block }: { block: Block }) {
+    const componentId = useComponentId("PublicBlockRenderer")
     const combinedStyles = {
         fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
         color: block.styles.color,
@@ -77,9 +80,9 @@ function PublicBlockRenderer({ block }: { block: Block }) {
 
     switch (block.type) {
         case 'heading':
-            return <h1 style={combinedStyles} className={className}>{block.content || 'Heading'}</h1>;
+            return <h1 style={combinedStyles} className={className} data-component-id={componentId}>{block.content || 'Heading'}</h1>;
         case 'paragraph':
-            return <p style={combinedStyles} className={className}>{block.content || 'Paragraph'}</p>;
+            return <p style={combinedStyles} className={className} data-component-id={componentId}>{block.content || 'Paragraph'}</p>;
         case 'image':
             return (
                 <img
@@ -87,6 +90,7 @@ function PublicBlockRenderer({ block }: { block: Block }) {
                     alt={block.imageDescription || 'Image'}
                     style={combinedStyles}
                     className={className}
+                    data-component-id={componentId}
                 />
             );
         case 'link':
@@ -97,6 +101,7 @@ function PublicBlockRenderer({ block }: { block: Block }) {
                     rel="noopener noreferrer"
                     style={combinedStyles}
                     className={className}
+                    data-component-id={componentId}
                 >
                     {block.linkText || block.content || 'Link'}
                 </a>

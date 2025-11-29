@@ -25,6 +25,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { Indexed, IndexedA, IndexedSpan } from "@/components/ui/indexed-primitives"
+
 export function NavProjects({
   projects,
 }: {
@@ -43,10 +45,10 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <IndexedA href={item.url}>
                 <item.icon />
-                <span>{item.name}</span>
-              </a>
+                <IndexedSpan>{item.name}</IndexedSpan>
+              </IndexedA>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -80,7 +82,7 @@ export function NavProjects({
         <SidebarMenuItem>
           <SidebarMenuButton>
             <MoreHorizontal />
-            <span>More</span>
+            <IndexedSpan>More</IndexedSpan>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

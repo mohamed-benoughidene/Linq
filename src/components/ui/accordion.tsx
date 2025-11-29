@@ -6,19 +6,24 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+import { useComponentId } from "@/lib/component-id"
+
 function Accordion({
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Root>) {
-  return <AccordionPrimitive.Root data-slot="accordion" {...props} />
+  const componentId = useComponentId("Accordion")
+  return <AccordionPrimitive.Root data-slot="accordion" data-component-id={componentId} {...props} />
 }
 
 function AccordionItem({
   className,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+  const componentId = useComponentId("AccordionItem")
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
+      data-component-id={componentId}
       className={cn("border-b last:border-b-0", className)}
       {...props}
     />
@@ -30,10 +35,12 @@ function AccordionTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+  const componentId = useComponentId("AccordionTrigger")
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
+        data-component-id={componentId}
         className={cn(
           "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
           className
@@ -52,9 +59,11 @@ function AccordionContent({
   children,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+  const componentId = useComponentId("AccordionContent")
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
+      data-component-id={componentId}
       className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
       {...props}
     >

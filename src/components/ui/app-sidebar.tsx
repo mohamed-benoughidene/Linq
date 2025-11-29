@@ -81,6 +81,8 @@ function createDefaultBlock(type: BlockType): Block {
   }
 }
 
+import { Indexed, IndexedA, IndexedSpan } from "@/components/ui/indexed-primitives"
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [addBlockModalOpen, setAddBlockModalOpen] = React.useState(false)
   const { addBlock } = useBuilderStore()
@@ -96,20 +98,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <>
       <Sidebar variant="inset" {...props}>
-        
+
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
-                <a href="#">
+                <IndexedA href="#">
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <Command className="size-4" />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">Acme Inc</span>
-                    <span className="truncate text-xs">Enterprise</span>
+                    <IndexedSpan className="truncate font-medium">Acme Inc</IndexedSpan>
+                    <IndexedSpan className="truncate text-xs">Enterprise</IndexedSpan>
                   </div>
-                </a>
+                </IndexedA>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -122,7 +124,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={() => setAddBlockModalOpen(true)}>
                   <PackagePlus className="h-4 w-4" />
-                  <span>Static Blocks</span>
+                  <Indexed.span>Static Blocks</Indexed.span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

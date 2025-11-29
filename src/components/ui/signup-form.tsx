@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
+import { IndexedDiv, IndexedA, IndexedH1 } from "@/components/ui/indexed-primitives"
+
 interface SignupFormData {
   email: string;
   password: string;
@@ -42,10 +44,10 @@ export function SignupForm({
   const [googleLoading, setGoogleLoading] = useState(false);
   const [retryAfter, setRetryAfter] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<{email?: string, password?: string}>({});
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string, password?: string }>({});
   const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | null>(null);
   const [shake, setShake] = useState(false);
-  const [touched, setTouched] = useState<{email: boolean, password: boolean}>({email: false, password: false});
+  const [touched, setTouched] = useState<{ email: boolean, password: boolean }>({ email: false, password: false });
 
   const router = useRouter();
   const supabase = createClient();
@@ -58,7 +60,7 @@ export function SignupForm({
       const hasLetters = /[a-zA-Z]/.test(password);
       const hasNumbers = /[0-9]/.test(password);
       const hasBoth = hasLetters && hasNumbers;
-      
+
       if (password.length < 6 || !hasBoth) {
         setPasswordStrength('weak');
       } else if (password.length < 10) {
@@ -114,26 +116,26 @@ export function SignupForm({
 
   // Handle field blur (when user leaves the field)
   const handleEmailBlur = () => {
-    setTouched(prev => ({...prev, email: true}));
+    setTouched(prev => ({ ...prev, email: true }));
     const email = getValues('email');
     const emailError = validateEmail(email);
     if (emailError) {
-      setFieldErrors(prev => ({...prev, email: emailError}));
+      setFieldErrors(prev => ({ ...prev, email: emailError }));
       triggerShake();
     } else {
-      setFieldErrors(prev => ({...prev, email: undefined}));
+      setFieldErrors(prev => ({ ...prev, email: undefined }));
     }
   };
 
   const handlePasswordBlur = () => {
-    setTouched(prev => ({...prev, password: true}));
+    setTouched(prev => ({ ...prev, password: true }));
     const password = getValues('password');
     const passwordError = validatePassword(password);
     if (passwordError) {
-      setFieldErrors(prev => ({...prev, password: passwordError}));
+      setFieldErrors(prev => ({ ...prev, password: passwordError }));
       triggerShake();
     } else {
-      setFieldErrors(prev => ({...prev, password: undefined}));
+      setFieldErrors(prev => ({ ...prev, password: undefined }));
     }
   };
 
@@ -142,7 +144,7 @@ export function SignupForm({
     if (touched.email) {
       const email = getValues('email');
       const emailError = validateEmail(email);
-      setFieldErrors(prev => ({...prev, email: emailError || undefined}));
+      setFieldErrors(prev => ({ ...prev, email: emailError || undefined }));
     }
   };
 
@@ -150,13 +152,13 @@ export function SignupForm({
     if (touched.password) {
       const password = getValues('password');
       const passwordError = validatePassword(password);
-      setFieldErrors(prev => ({...prev, password: passwordError || undefined}));
+      setFieldErrors(prev => ({ ...prev, password: passwordError || undefined }));
     }
   };
 
   async function handleSignup(Userdata: SignupFormData) {
     console.log("calling handleSignup");
-    
+
     setErrorMessage(null);
     setMessage(null);
     setLoading(true);
@@ -219,7 +221,7 @@ export function SignupForm({
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     setErrorMessage(null);
-    
+
     try {
       await signInWithGoogle();
     } catch (err) {
@@ -231,7 +233,7 @@ export function SignupForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <IndexedDiv className={cn("flex flex-col gap-6", className)} {...props}>
       <form onSubmit={handleSubmit((data) => handleSignup(data))}>
         <div className={cn("transition-all duration-200", shake && "animate-shake")}>
           {/* Success Message */}
@@ -254,13 +256,28 @@ export function SignupForm({
                     <span className="font-medium">Retry in {retryAfter} seconds</span>
                   </div>
                 )}
+                <div className={cn(
+                  "h-1 flex-1 rounded-full transition-all duration-300",
+                  passwordStrength === 'strong' ? "bg-green-500" : "bg-gray-200"
+                )} />
               </div>
+              <p className={cn(
+                "text-xs transition-colors duration-200",
+                passwordStrength === 'weak' && "text-red-600",
+                passwordStrength === 'medium' && "text-yellow-600",
+                passwordStrength === 'strong' && "text-green-600"
+              )}>
+                Password strength: {passwordStrength}
+                {passwordStrength === 'weak' && " - Must have letters & numbers, 6+ characters"}
+                {passwordStrength === 'medium' && " - Good! Try 10+ characters for strong"}
+                {passwordStrength === 'strong' && " - Excellent!"}
+              </p>
             </div>
           )}
 
           <FieldGroup>
             <div className="flex flex-col items-center gap-2 text-center">
-              <a
+              <IndexedA
                 href="#"
                 className="flex flex-col items-center gap-2 font-medium"
               >
@@ -268,8 +285,8 @@ export function SignupForm({
                   <GalleryVerticalEnd className="size-6" />
                 </div>
                 <span className="sr-only">Acme Inc.</span>
-              </a>
-              <h1 className="text-xl font-bold">Welcome to Acme Inc.</h1>
+              </IndexedA>
+              <IndexedH1 className="text-xl font-bold">Welcome to Acme Inc.</IndexedH1>
               <FieldDescription>
                 Already have an account? <Link href="/login" className="hover:underline transition-all duration-200">Sign in</Link>
               </FieldDescription>
@@ -327,10 +344,10 @@ export function SignupForm({
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              
+
               {/* Password Strength Indicator */}
               {password && passwordStrength && (
                 <div className="mt-2 animate-fade-in">
@@ -351,20 +368,9 @@ export function SignupForm({
                       passwordStrength === 'strong' ? "bg-green-500" : "bg-gray-200"
                     )} />
                   </div>
-                  <p className={cn(
-                    "text-xs transition-colors duration-200",
-                    passwordStrength === 'weak' && "text-red-600",
-                    passwordStrength === 'medium' && "text-yellow-600",
-                    passwordStrength === 'strong' && "text-green-600"
-                  )}>
-                    Password strength: {passwordStrength}
-                    {passwordStrength === 'weak' && " - Must have letters & numbers, 6+ characters"}
-                    {passwordStrength === 'medium' && " - Good! Try 10+ characters for strong"}
-                    {passwordStrength === 'strong' && " - Excellent!"}
-                  </p>
                 </div>
               )}
-              
+
               {fieldErrors.password && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1 animate-fade-in">
                   <AlertCircle className="w-4 h-4" />
@@ -375,8 +381,8 @@ export function SignupForm({
 
             {/* Submit Button */}
             <Field>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || googleLoading || (retryAfter !== null && retryAfter > 0)}
                 className="relative transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
@@ -395,8 +401,8 @@ export function SignupForm({
 
             {/* Google Sign In Button */}
             <Field>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading || loading}
@@ -421,9 +427,9 @@ export function SignupForm({
         </div>
       </form>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#" className="hover:underline">Terms of Service</a>{" "}
-        and <a href="#" className="hover:underline">Privacy Policy</a>.
+        By clicking continue, you agree to our <IndexedA href="#" className="hover:underline">Terms of Service</IndexedA>{" "}
+        and <IndexedA href="#" className="hover:underline">Privacy Policy</IndexedA>.
       </FieldDescription>
-    </div>
+    </IndexedDiv>
   )
 }

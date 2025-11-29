@@ -30,6 +30,8 @@ interface LoginFormData {
   password: string;
 }
 
+import { IndexedDiv, IndexedA } from "@/components/ui/indexed-primitives"
+
 export function LoginForm({
   className,
   ...props
@@ -45,10 +47,10 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<{email?: string, password?: string}>({});
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string, password?: string }>({});
   const [shake, setShake] = useState(false);
-  const [touched, setTouched] = useState<{email: boolean, password: boolean}>({email: false, password: false});
-  
+  const [touched, setTouched] = useState<{ email: boolean, password: boolean }>({ email: false, password: false });
+
   const supabase = createClient();
   const router = useRouter();
 
@@ -82,26 +84,26 @@ export function LoginForm({
 
   // Handle field blur (when user leaves the field)
   const handleEmailBlur = () => {
-    setTouched(prev => ({...prev, email: true}));
+    setTouched(prev => ({ ...prev, email: true }));
     const email = getValues('email');
     const emailError = validateEmail(email);
     if (emailError) {
-      setFieldErrors(prev => ({...prev, email: emailError}));
+      setFieldErrors(prev => ({ ...prev, email: emailError }));
       triggerShake();
     } else {
-      setFieldErrors(prev => ({...prev, email: undefined}));
+      setFieldErrors(prev => ({ ...prev, email: undefined }));
     }
   };
 
   const handlePasswordBlur = () => {
-    setTouched(prev => ({...prev, password: true}));
+    setTouched(prev => ({ ...prev, password: true }));
     const password = getValues('password');
     const passwordError = validatePassword(password);
     if (passwordError) {
-      setFieldErrors(prev => ({...prev, password: passwordError}));
+      setFieldErrors(prev => ({ ...prev, password: passwordError }));
       triggerShake();
     } else {
-      setFieldErrors(prev => ({...prev, password: undefined}));
+      setFieldErrors(prev => ({ ...prev, password: undefined }));
     }
   };
 
@@ -110,7 +112,7 @@ export function LoginForm({
     if (touched.email) {
       const email = getValues('email');
       const emailError = validateEmail(email);
-      setFieldErrors(prev => ({...prev, email: emailError || undefined}));
+      setFieldErrors(prev => ({ ...prev, email: emailError || undefined }));
     }
   };
 
@@ -118,7 +120,7 @@ export function LoginForm({
     if (touched.password) {
       const password = getValues('password');
       const passwordError = validatePassword(password);
-      setFieldErrors(prev => ({...prev, password: passwordError || undefined}));
+      setFieldErrors(prev => ({ ...prev, password: passwordError || undefined }));
     }
   };
 
@@ -149,7 +151,7 @@ export function LoginForm({
     if (error) {
       // Provide user-friendly error messages
       let errorMessage = error.message;
-      
+
       if (error.message.includes("Invalid login credentials")) {
         errorMessage = "The email or password you entered is incorrect. Please try again.";
       } else if (error.message.includes("Email not confirmed")) {
@@ -157,7 +159,7 @@ export function LoginForm({
       } else if (error.message.includes("Too many requests")) {
         errorMessage = "Too many login attempts. Please wait a few minutes and try again.";
       }
-      
+
       setError(errorMessage);
       setLoading(false);
       triggerShake();
@@ -171,7 +173,7 @@ export function LoginForm({
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     setError(null);
-    
+
     try {
       await signInWithGoogle();
     } catch (err) {
@@ -183,7 +185,7 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <IndexedDiv className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className={cn("transition-all duration-200", shake && "animate-shake")}>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -206,8 +208,8 @@ export function LoginForm({
 
               {/* Google Sign In Button */}
               <Field>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={googleLoading || loading}
@@ -292,7 +294,7 @@ export function LoginForm({
                     tabIndex={-1}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
                 {fieldErrors.password && (
@@ -305,8 +307,8 @@ export function LoginForm({
 
               {/* Submit Button */}
               <Field>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading || googleLoading}
                   className="relative transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
@@ -334,9 +336,9 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#" className="hover:underline">Terms of Service</a>{" "}
-        and <a href="#" className="hover:underline">Privacy Policy</a>.
+        By clicking continue, you agree to our <IndexedA href="#" className="hover:underline">Terms of Service</IndexedA>{" "}
+        and <IndexedA href="#" className="hover:underline">Privacy Policy</IndexedA>.
       </FieldDescription>
-    </div>
+    </IndexedDiv>
   )
 }

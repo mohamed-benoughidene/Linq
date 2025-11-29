@@ -3,13 +3,15 @@
 import { Block } from '@/types/builder'
 import { cn } from '@/lib/utils'
 import { ImageIcon } from 'lucide-react'
+import { useComponentId } from '@/lib/component-id'
 
 interface BlockRendererProps {
     block: Block
-    onClick?: () => void
+    onClick?: (e: React.MouseEvent) => void
 }
 
 export function BlockRenderer({ block, onClick }: BlockRendererProps) {
+    const componentId = useComponentId("BlockRenderer")
     // HYBRID STYLING: Inline for custom values
     const combinedStyles = {
         fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
@@ -36,13 +38,13 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
     switch (block.type) {
         case 'heading':
             return (
-                <h1 style={combinedStyles} className={className} onClick={onClick}>
+                <h1 style={combinedStyles} className={className} onClick={onClick} data-component-id={componentId}>
                     {block.content || 'Heading'}
                 </h1>
             )
         case 'paragraph':
             return (
-                <p style={combinedStyles} className={className} onClick={onClick}>
+                <p style={combinedStyles} className={className} onClick={onClick} data-component-id={componentId}>
                     {block.content || 'Paragraph'}
                 </p>
             )
@@ -51,7 +53,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
             const hasImage = block.imageUrl && block.imageUrl.trim() !== ''
 
             return (
-                <div style={combinedStyles} className={className} onClick={onClick}>
+                <div style={combinedStyles} className={className} onClick={onClick} data-component-id={componentId}>
                     {hasImage ? (
                         <img
                             src={block.imageUrl}
@@ -85,7 +87,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
                     onClick={(e) => {
                         // Prevent navigation when editing
                         e.preventDefault()
-                        onClick?.()
+                        onClick?.(e)
                     }}
                 >
                     {linkDisplay}

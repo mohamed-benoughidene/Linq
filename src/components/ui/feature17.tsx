@@ -1,3 +1,6 @@
+"use client"
+
+import { IndexedSection, IndexedDiv, IndexedH2, IndexedSpan, IndexedH3, IndexedP, IndexedA } from "@/components/ui/indexed-primitives"
 import {
   BatteryCharging,
   GitPullRequest,
@@ -69,42 +72,42 @@ const Feature17 = ({
   buttonUrl = "https://shadcnblocks.com",
 }: Feature17Props) => {
   return (
-    <section className="py-32" id="features">
-      <div className="container">
+    <IndexedSection className="py-32" id="features">
+      <IndexedDiv className="container">
         {(label || title) && (
-          <div className="mb-12 flex max-w-3xl flex-col gap-4">
+          <IndexedDiv className="mb-12 flex max-w-3xl flex-col gap-4">
             <Badge variant="secondary">{label}</Badge>
-            <h2 className="text-3xl font-medium md:text-4xl lg:text-5xl">
+            <IndexedH2 className="text-3xl font-medium md:text-4xl lg:text-5xl">
               {title}
-            </h2>
-          </div>
+            </IndexedH2>
+          </IndexedDiv>
         )}
-        <div className="grid gap-12 md:grid-cols-2">
+        <IndexedDiv className="grid gap-12 md:grid-cols-2">
           {features.map((feature, idx) => (
-            <div className="flex gap-6 space-y-4 rounded-lg md:block" key={idx}>
-              <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-full md:size-12">
+            <IndexedDiv className="flex gap-6 space-y-4 rounded-lg md:block" key={idx}>
+              <IndexedSpan className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-full md:size-12">
                 {feature.icon}
-              </span>
-              <div>
-                <h3 className="font-medium md:mb-2 md:text-xl">
+              </IndexedSpan>
+              <IndexedDiv>
+                <IndexedH3 className="font-medium md:mb-2 md:text-xl">
                   {feature.heading}
-                </h3>
-                <p className="text-muted-foreground text-sm md:text-base">
+                </IndexedH3>
+                <IndexedP className="text-muted-foreground text-sm md:text-base">
                   {feature.description}
-                </p>
-              </div>
-            </div>
+                </IndexedP>
+              </IndexedDiv>
+            </IndexedDiv>
           ))}
-        </div>
+        </IndexedDiv>
         {buttonUrl && (
-          <div className="mt-16 flex justify-center">
+          <IndexedDiv className="mt-16 flex justify-center">
             <Button size="lg" asChild>
-              <a href={buttonUrl}>{buttonText}</a>
+              <IndexedA href={buttonUrl}>{buttonText}</IndexedA>
             </Button>
-          </div>
+          </IndexedDiv>
         )}
-      </div>
-    </section>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 

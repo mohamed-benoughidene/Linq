@@ -628,6 +628,66 @@ setPageTitle(title: string)
 
 ---
 
+## Universal Element Indexing System
+
+To support advanced features like visual editing and analytics, **every single UI element** in the application must have a unique, stable `data-component-id`.
+
+### Core Requirement
+**All new UI components and modifications to existing components MUST use the `Indexed` primitives from `@/components/ui/indexed-primitives` instead of standard HTML tags.**
+
+### How it works
+The `indexed-primitives.tsx` file exports named wrapper components (e.g., `IndexedDiv`, `IndexedSpan`, `IndexedA`) that automatically generate and attach a unique `data-component-id` to the underlying DOM element using the `useComponentId` hook.
+
+### Usage Guidelines
+
+1.  **Import Named Primitives:**
+    ```tsx
+    import { IndexedDiv, IndexedH1, IndexedSpan, IndexedA } from "@/components/ui/indexed-primitives"
+    ```
+
+2.  **Replace HTML Tags:**
+    *   `<div>` → `<IndexedDiv>`
+    *   `<span>` → `<IndexedSpan>`
+    *   `<p>` → `<IndexedP>`
+    *   `<h1>` → `<IndexedH1>`
+    *   `<a>` → `<IndexedA>`
+    *   `<button>` → `<IndexedButton>` (if available, otherwise wrap or use `IndexedDiv` as container)
+    *   ...and so on.
+
+3.  **Example:**
+
+    **❌ Incorrect (Standard HTML):**
+    ```tsx
+    export function MyComponent() {
+      return (
+        <div className="card">
+          <h1>Title</h1>
+          <p>Description</p>
+        </div>
+      )
+    }
+    ```
+
+    **✅ Correct (Indexed Primitives):**
+    ```tsx
+    import { IndexedDiv, IndexedH1, IndexedP } from "@/components/ui/indexed-primitives"
+
+    export function MyComponent() {
+      return (
+        <IndexedDiv className="card">
+          <IndexedH1>Title</IndexedH1>
+          <IndexedP>Description</IndexedP>
+        </IndexedDiv>
+      )
+    }
+    ```
+
+4.  **Exceptions:**
+    *   Third-party components that don't accept `data-component-id` (wrap them in an `IndexedDiv` if possible).
+    *   SVG elements (unless specifically needed).
+
+---
+
 ## Deployment Checklist
 
 When deploying to production (Vercel):
@@ -753,6 +813,12 @@ When deploying to production (Vercel):
 - **Type Safety**: Strict TypeScript types in `src/types/builder.ts`
 - **Dual Lock System**: `themeLocked` prevents global theme changes, `microInteractionsLocked` prevents global interaction changes
 - **Apply Button Pattern**: Expensive operations (applying global themes/interactions) require explicit user action, while local edits are live
+
+### Authenticated Navigation (Phase 11)
+- **UserNav Component**: Dropdown menu with user avatar, profile, settings, and logout options.
+- **Navbar Integration**: Conditional rendering based on auth state (Login/Signup vs Dashboard/UserNav).
+- **Session Handling**: Server-side session fetching in `page.tsx` passed to client components.
+- **Responsive Design**: "Dashboard" button adapts width on mobile (`w-full sm:w-auto`).
 
 ### Authentication & Security
 - Added Google OAuth authentication (login + signup)

@@ -4,8 +4,10 @@ import { useBuilderStore } from '@/store/builderStore'
 import { BlockRenderer } from './BlockRenderer'
 import { BlockEditor } from './BlockEditor'
 import { useEffect } from 'react'
+import { useComponentId } from '@/lib/component-id'
 
 export function Canvas() {
+    const componentId = useComponentId("Canvas")
     const { blocks, selectedBlockId, selectBlock, undo, redo } = useBuilderStore()
 
     useEffect(() => {
@@ -48,7 +50,7 @@ export function Canvas() {
     }, [undo, redo])
 
     return (
-        <div className="canvas min-h-screen bg-background p-8">
+        <div className="canvas min-h-screen bg-background p-8" data-component-id={componentId}>
             <div className="max-w-4xl mx-auto space-y-4">
                 {blocks.length === 0 ? (
                     <p className="text-muted-foreground text-center">

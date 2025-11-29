@@ -1,3 +1,6 @@
+"use client"
+
+import { IndexedSection, IndexedDiv, IndexedH1 } from "@/components/ui/indexed-primitives"
 import {
   Accordion,
   AccordionContent,
@@ -64,11 +67,11 @@ const Faq1 = ({
   ],
 }: Faq1Props) => {
   return (
-    <section className="py-32" id="faq">
-      <div className="container max-w-3xl">
-        <h1 className="mb-4 text-3xl font-semibold md:mb-11 md:text-4xl">
+    <IndexedSection className="py-32" id="faq">
+      <IndexedDiv className="container max-w-3xl">
+        <IndexedH1 className="mb-4 text-3xl font-semibold md:mb-11 md:text-4xl">
           {heading}
-        </h1>
+        </IndexedH1>
         <Accordion type="single" collapsible>
           {items.map((item, index) => (
             <AccordionItem key={index} value={`item-${index}`}>
@@ -81,8 +84,8 @@ const Faq1 = ({
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
-    </section>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 

@@ -1,3 +1,15 @@
+"use client"
+
+import {
+  IndexedSection,
+  IndexedDiv,
+  IndexedFooter,
+  IndexedP,
+  IndexedH3,
+  IndexedUl,
+  IndexedLi,
+  IndexedA
+} from "@/components/ui/indexed-primitives"
 
 interface MenuItem {
   title: string;
@@ -78,12 +90,12 @@ const Footer2 = ({
   ],
 }: Footer2Props) => {
   return (
-    <section className="py-32">
-      <div className="container">
-        <footer>
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-6">
-            <div className="col-span-2 mb-8 lg:mb-0">
-              <div className="flex items-center gap-2 lg:justify-start">
+    <IndexedSection className="py-32">
+      <IndexedDiv className="container">
+        <IndexedFooter>
+          <IndexedDiv className="grid grid-cols-2 gap-8 lg:grid-cols-6">
+            <IndexedDiv className="col-span-2 mb-8 lg:mb-0">
+              <IndexedDiv className="flex items-center gap-2 lg:justify-start">
                 {
                   /*  <Logo url="https://shadcnblocks.com">
                   <LogoImage
@@ -95,39 +107,39 @@ const Footer2 = ({
                   <LogoText className="text-xl">{logo.title}</LogoText>
                 </Logo> */
                 }
-              
-              </div>
-              <p className="mt-4 font-bold">{tagline}</p>
-            </div>
+
+              </IndexedDiv>
+              <IndexedP className="mt-4 font-bold">{tagline}</IndexedP>
+            </IndexedDiv>
             {menuItems.map((section, sectionIdx) => (
-              <div key={sectionIdx}>
-                <h3 className="mb-4 font-bold">{section.title}</h3>
-                <ul className="text-muted-foreground space-y-4">
+              <IndexedDiv key={sectionIdx}>
+                <IndexedH3 className="mb-4 font-bold">{section.title}</IndexedH3>
+                <IndexedUl className="text-muted-foreground space-y-4">
                   {section.links.map((link, linkIdx) => (
-                    <li
+                    <IndexedLi
                       key={linkIdx}
                       className="hover:text-primary font-medium"
                     >
-                      <a href={link.url}>{link.text}</a>
-                    </li>
+                      <IndexedA href={link.url}>{link.text}</IndexedA>
+                    </IndexedLi>
                   ))}
-                </ul>
-              </div>
+                </IndexedUl>
+              </IndexedDiv>
             ))}
-          </div>
-          <div className="text-muted-foreground mt-24 flex flex-col justify-between gap-4 border-t pt-8 text-sm font-medium md:flex-row md:items-center">
-            <p>{copyright}</p>
-            <ul className="flex gap-4">
+          </IndexedDiv>
+          <IndexedDiv className="text-muted-foreground mt-24 flex flex-col justify-between gap-4 border-t pt-8 text-sm font-medium md:flex-row md:items-center">
+            <IndexedP>{copyright}</IndexedP>
+            <IndexedUl className="flex gap-4">
               {bottomLinks.map((link, linkIdx) => (
-                <li key={linkIdx} className="hover:text-primary underline">
-                  <a href={link.url}>{link.text}</a>
-                </li>
+                <IndexedLi key={linkIdx} className="hover:text-primary underline">
+                  <IndexedA href={link.url}>{link.text}</IndexedA>
+                </IndexedLi>
               ))}
-            </ul>
-          </div>
-        </footer>
-      </div>
-    </section>
+            </IndexedUl>
+          </IndexedDiv>
+        </IndexedFooter>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 

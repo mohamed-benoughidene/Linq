@@ -26,6 +26,7 @@ import {
     SidebarMenuSub,
 } from '@/components/ui/sidebar'
 import { getContrastTextColor } from '@/lib/colorUtils'
+import { useComponentId } from '@/lib/component-id'
 
 interface BlockEditorProps {
     block: Block
@@ -35,6 +36,7 @@ interface BlockEditorProps {
 }
 
 export function BlockEditor({ block, open, onOpenChange, children }: BlockEditorProps) {
+    const componentId = useComponentId("BlockEditor")
     const [isMobile, setIsMobile] = useState(false)
     const [content, setContent] = useState(block.content)
     const { updateBlock, applyBlockTheme } = useBuilderStore()
@@ -522,7 +524,7 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                 {children}
             </div>
             <Sheet open={open} onOpenChange={onOpenChange}>
-                <SheetContent side={isMobile ? "bottom" : "right"} className={isMobile ? "h-[80vh]" : "w-[400px] sm:w-[540px]"}>
+                <SheetContent side={isMobile ? "bottom" : "right"} className={isMobile ? "h-[80vh]" : "w-[400px] sm:w-[540px]"} data-component-id={componentId}>
                     <SheetHeader>
                         <SheetTitle>Edit Block</SheetTitle>
                     </SheetHeader>

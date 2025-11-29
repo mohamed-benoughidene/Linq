@@ -1,7 +1,17 @@
+"use client"
+
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  IndexedSection,
+  IndexedDiv,
+  IndexedH1,
+  IndexedP,
+  IndexedImg
+} from "@/components/ui/indexed-primitives";
+import { useComponentId } from "@/lib/component-id";
 
 interface Hero1Props {
   badge?: string;
@@ -20,6 +30,7 @@ interface Hero1Props {
   image?: {
     src: string;
     alt: string;
+    title?: string;
   };
 }
 
@@ -42,24 +53,25 @@ const Hero1 = ({
     alt: "Hero section demo image showing interface components",
   },
 }: Hero1Props) => {
+  const componentId = useComponentId("Hero1")
   return (
-    <section className="py-32" id="hero">
-      <div className="container">
-        <div className="grid items-center gap-8 lg:grid-cols-2">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+    <IndexedSection className="py-32" id="hero" data-component-id={componentId}>
+      <IndexedDiv className="container">
+        <IndexedDiv className="grid items-center gap-8 lg:grid-cols-2">
+          <IndexedDiv className="flex flex-col items-center text-center lg:items-start lg:text-left">
             {badge && (
               <Badge variant="outline">
                 {badge}
                 <ArrowUpRight className="ml-2 size-4" />
               </Badge>
             )}
-            <h1 className="my-6 text-pretty text-4xl font-bold lg:text-6xl">
+            <IndexedH1 className="my-6 text-pretty text-4xl font-bold lg:text-6xl">
               {heading}
-            </h1>
-            <p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
+            </IndexedH1>
+            <IndexedP className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
               {description}
-            </p>
-            <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
+            </IndexedP>
+            <IndexedDiv className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
               {buttons.primary && (
                 <Button asChild className="w-full sm:w-auto">
                   <a href={buttons.primary.url}>{buttons.primary.text}</a>
@@ -73,16 +85,16 @@ const Hero1 = ({
                   </a>
                 </Button>
               )}
-            </div>
-          </div>
-          <img
+            </IndexedDiv>
+          </IndexedDiv>
+          <IndexedImg
             src={image.src}
             alt={image.alt}
             className="max-h-96 w-full rounded-md object-cover"
           />
-        </div>
-      </div>
-    </section>
+        </IndexedDiv>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 

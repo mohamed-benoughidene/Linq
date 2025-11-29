@@ -6,6 +6,8 @@ import { CircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+import { useComponentId } from "@/lib/component-id"
+
 function RadioGroup({
   className,
   ...props
@@ -23,9 +25,11 @@ function RadioGroupItem({
   className,
   ...props
 }: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
+  const componentId = useComponentId("RadioGroupItem")
   return (
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
+      data-component-id={componentId}
       className={cn(
         "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
         className

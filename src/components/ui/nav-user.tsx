@@ -31,6 +31,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { Indexed, IndexedSpan } from "@/components/ui/indexed-primitives"
+
 export function NavUser({
   user,
 }: {
@@ -56,8 +58,8 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <IndexedSpan className="truncate font-medium">{user.name}</IndexedSpan>
+                <IndexedSpan className="truncate text-xs">{user.email}</IndexedSpan>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -75,8 +77,8 @@ export function NavUser({
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <Indexed.span className="truncate font-medium">{user.name}</Indexed.span>
+                  <Indexed.span className="truncate text-xs">{user.email}</Indexed.span>
                 </div>
               </div>
             </DropdownMenuLabel>

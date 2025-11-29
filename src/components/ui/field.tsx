@@ -7,10 +7,14 @@ import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 
+import { useComponentId } from "@/lib/component-id"
+
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
+  const componentId = useComponentId("FieldSet")
   return (
     <fieldset
       data-slot="field-set"
+      data-component-id={componentId}
       className={cn(
         "flex flex-col gap-6",
         "has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3",
@@ -26,9 +30,11 @@ function FieldLegend({
   variant = "legend",
   ...props
 }: React.ComponentProps<"legend"> & { variant?: "legend" | "label" }) {
+  const componentId = useComponentId("FieldLegend")
   return (
     <legend
       data-slot="field-legend"
+      data-component-id={componentId}
       data-variant={variant}
       className={cn(
         "mb-3 font-medium",
@@ -42,9 +48,11 @@ function FieldLegend({
 }
 
 function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
+  const componentId = useComponentId("FieldGroup")
   return (
     <div
       data-slot="field-group"
+      data-component-id={componentId}
       className={cn(
         "group/field-group @container/field-group flex w-full flex-col gap-7 data-[slot=checkbox-group]:gap-3 [&>[data-slot=field-group]]:gap-4",
         className
@@ -83,10 +91,12 @@ function Field({
   orientation = "vertical",
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
+  const componentId = useComponentId("Field")
   return (
     <div
       role="group"
       data-slot="field"
+      data-component-id={componentId}
       data-orientation={orientation}
       className={cn(fieldVariants({ orientation }), className)}
       {...props}
@@ -95,9 +105,11 @@ function Field({
 }
 
 function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
+  const componentId = useComponentId("FieldContent")
   return (
     <div
       data-slot="field-content"
+      data-component-id={componentId}
       className={cn(
         "group/field-content flex flex-1 flex-col gap-1.5 leading-snug",
         className
@@ -111,9 +123,11 @@ function FieldLabel({
   className,
   ...props
 }: React.ComponentProps<typeof Label>) {
+  const componentId = useComponentId("FieldLabel")
   return (
     <Label
       data-slot="field-label"
+      data-component-id={componentId}
       className={cn(
         "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50",
         "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border [&>*]:data-[slot=field]:p-4",
@@ -126,9 +140,11 @@ function FieldLabel({
 }
 
 function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
+  const componentId = useComponentId("FieldTitle")
   return (
     <div
       data-slot="field-label"
+      data-component-id={componentId}
       className={cn(
         "flex w-fit items-center gap-2 text-sm leading-snug font-medium group-data-[disabled=true]/field:opacity-50",
         className
@@ -139,9 +155,11 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
+  const componentId = useComponentId("FieldDescription")
   return (
     <p
       data-slot="field-description"
+      data-component-id={componentId}
       className={cn(
         "text-muted-foreground text-sm leading-normal font-normal group-has-[[data-orientation=horizontal]]/field:text-balance",
         "last:mt-0 nth-last-2:-mt-1 [[data-variant=legend]+&]:-mt-1.5",
@@ -160,9 +178,11 @@ function FieldSeparator({
 }: React.ComponentProps<"div"> & {
   children?: React.ReactNode
 }) {
+  const componentId = useComponentId("FieldSeparator")
   return (
     <div
       data-slot="field-separator"
+      data-component-id={componentId}
       data-content={!!children}
       className={cn(
         "relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2",
@@ -222,10 +242,13 @@ function FieldError({
     return null
   }
 
+  const componentId = useComponentId("FieldError")
+
   return (
     <div
       role="alert"
       data-slot="field-error"
+      data-component-id={componentId}
       className={cn("text-destructive text-sm font-normal", className)}
       {...props}
     >

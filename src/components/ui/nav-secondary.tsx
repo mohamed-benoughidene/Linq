@@ -9,6 +9,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+import { IndexedA, IndexedSpan } from "@/components/ui/indexed-primitives"
+
 export function NavSecondary({
   items,
   ...props
@@ -26,10 +28,10 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
+                <IndexedA href={item.url}>
                   <item.icon />
-                  <span>{item.title}</span>
-                </a>
+                  <IndexedSpan>{item.title}</IndexedSpan>
+                </IndexedA>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

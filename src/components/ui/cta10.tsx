@@ -1,3 +1,6 @@
+"use client"
+
+import { IndexedSection, IndexedDiv, IndexedH3, IndexedP, IndexedA } from "@/components/ui/indexed-primitives"
 import { Button } from "@/components/ui/button";
 
 interface Cta10Props {
@@ -26,32 +29,32 @@ const Cta10 = ({
   },
 }: Cta10Props) => {
   return (
-    <section className="py-32">
-      <div className="container">
-        <div className="bg-accent flex w-full flex-col gap-16 overflow-hidden rounded-lg p-8 md:rounded-xl lg:flex-row lg:items-center lg:p-12">
-          <div className="flex-1">
-            <h3 className="mb-3 text-2xl font-semibold md:mb-4 md:text-4xl lg:mb-6">
+    <IndexedSection className="py-32">
+      <IndexedDiv className="container">
+        <IndexedDiv className="bg-accent flex w-full flex-col gap-16 overflow-hidden rounded-lg p-8 md:rounded-xl lg:flex-row lg:items-center lg:p-12">
+          <IndexedDiv className="flex-1">
+            <IndexedH3 className="mb-3 text-2xl font-semibold md:mb-4 md:text-4xl lg:mb-6">
               {heading}
-            </h3>
-            <p className="text-muted-foreground max-w-xl lg:text-lg">
+            </IndexedH3>
+            <IndexedP className="text-muted-foreground max-w-xl lg:text-lg">
               {description}
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+            </IndexedP>
+          </IndexedDiv>
+          <IndexedDiv className="flex shrink-0 flex-col gap-2 sm:flex-row">
             {buttons.secondary && (
               <Button variant="outline" asChild>
-                <a href={buttons.secondary.url}>{buttons.secondary.text}</a>
+                <IndexedA href={buttons.secondary.url}>{buttons.secondary.text}</IndexedA>
               </Button>
             )}
             {buttons.primary && (
               <Button asChild variant="default" size="lg">
-                <a href={buttons.primary.url}>{buttons.primary.text}</a>
+                <IndexedA href={buttons.primary.url}>{buttons.primary.text}</IndexedA>
               </Button>
             )}
-          </div>
-        </div>
-      </div>
-    </section>
+          </IndexedDiv>
+        </IndexedDiv>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 

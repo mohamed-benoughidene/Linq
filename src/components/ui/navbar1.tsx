@@ -1,14 +1,22 @@
+"use client"
+
 import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
 import Link from 'next/link';
 import {
   Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
   Sheet,
@@ -17,13 +25,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-}
+import { cn } from "@/lib/utils";
+import { UserNav } from "@/components/ui/user-nav";
+import { useComponentId } from "@/lib/component-id";
+import {
+  IndexedSection,
+  IndexedDiv,
+  IndexedNav,
+  IndexedA,
+  IndexedImg,
+  IndexedSpan,
+  IndexedP
+} from "@/components/ui/indexed-primitives";
 
 interface Navbar1Props {
   logo?: {
@@ -32,17 +45,32 @@ interface Navbar1Props {
     alt: string;
     title: string;
   };
-  menu?: MenuItem[];
+  menu?: {
+    title: string;
+    url: string;
+    items?: {
+      title: string;
+      description: string;
+      icon: React.ReactNode;
+      url: string;
+    }[];
+  }[];
+  mobileExtraLinks?: {
+    name: string;
+    url: string;
+  }[];
   auth?: {
     login: {
-      title: string;
+      text: string;
       url: string;
     };
     signup: {
-      title: string;
+      text: string;
       url: string;
     };
   };
+  user?: any;
+  onLogout?: () => void;
 }
 
 const Navbar1 = ({
@@ -54,170 +82,180 @@ const Navbar1 = ({
   },
   menu = [
     { title: "Home", url: "#hero" },
-    {
-      title: "Features",
-      url: "#features",
-    },
-    {
-      title: "how it works",
-      url: "#how-it-works",
-    },
-     {
-      title: "Why choose us",
-      url: "#why-choose-us",
-    },
-    {
-      title: "Pricing",
-      url: "#pricing",
-    },
-    {
-      title: "Faq",
-      url: "#faq",
-    },
+    { title: "Features", url: "#features" },
+    { title: "how it works", url: "#how-it-works" },
+    { title: "Why choose us", url: "#why-choose-us" },
+    { title: "Pricing", url: "#pricing" },
+    { title: "Faq", url: "#faq" },
+  ],
+  mobileExtraLinks = [
+    { name: "Press", url: "#" },
+    { name: "Contact", url: "#" },
+    { name: "Imprint", url: "#" },
+    { name: "Sitemap", url: "#" },
   ],
   auth = {
-    login: { title: "Login", url: "/login" },
-    signup: { title: "Sign up", url: "/signup" },
+    login: { text: "Log in", url: "/login" },
+    signup: { text: "Sign up", url: "/signup" },
   },
+  user,
+  onLogout,
 }: Navbar1Props) => {
+  const componentId = useComponentId("Navbar1")
   return (
-    <section className="py-4">
-      <div className="container lg:flex lg:justify-center">
-        {/* Desktop Menu */}
-        <nav className="hidden items-center justify-between lg:flex w-full">
-          <div className="flex items-center gap-6">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
-              <span className="text-lg font-semibold tracking-tighter">
+    <IndexedSection className="py-4" data-component-id={componentId}>
+      <IndexedDiv className="container lg:flex lg:justify-center">
+        <IndexedNav className="hidden items-center justify-between lg:flex w-full">
+          <IndexedDiv className="flex items-center gap-6">
+            <IndexedA href={logo.url} className="flex items-center gap-2">
+              <IndexedImg className="max-h-8 dark:invert" alt={logo.alt} src={logo.src} />
+              <IndexedSpan className="text-lg font-semibold tracking-tighter">
                 {logo.title}
-              </span>
-            </a>
-            <div className="flex items-center">
+              </IndexedSpan>
+            </IndexedA>
+            <IndexedDiv className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
+                  {menu.map((item) => (
+                    <NavigationMenuItem key={item.title}>
+                      <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link href={item.url}>
+                          {item.title}
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
                 </NavigationMenuList>
               </NavigationMenu>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link
-            key={auth.login.title}
-            href={auth.login.url}
-          >
-                {auth.login.title}
-          </Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link
-                key={auth.signup.title}
-                href={auth.signup.url}
-              >
-                {auth.signup.title}
-              </Link>
-            </Button>
-          </div>
-        </nav>
-
-        {/* Mobile Menu */}
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
-            </a>
+            </IndexedDiv>
+          </IndexedDiv>
+          <IndexedDiv className="flex gap-4 items-center">
+            {user ? (
+              <>
+                <Button asChild variant="default" className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white">
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
+                <UserNav user={user} onLogout={onLogout} />
+              </>
+            ) : (
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <a href={auth.login.url}>{auth.login.text}</a>
+                </Button>
+                <Button asChild size="sm">
+                  <a href={auth.signup.url}>{auth.signup.text}</a>
+                </Button>
+              </>
+            )}
+          </IndexedDiv>
+        </IndexedNav>
+        <IndexedDiv className="block lg:hidden">
+          <IndexedDiv className="flex items-center justify-between">
+            <IndexedA href={logo.url} className="flex items-center gap-2">
+              <IndexedImg className="max-h-8 dark:invert" alt={logo.alt} src={logo.src} />
+              <IndexedSpan className="text-lg font-semibold tracking-tighter">
+                {logo.title}
+              </IndexedSpan>
+            </IndexedA>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
+              <SheetContent>
                 <SheetHeader>
                   <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
-                      <img
-                        src={logo.src}
+                    <IndexedA href={logo.url} className="flex items-center gap-2">
+                      <IndexedImg
                         className="max-h-8 dark:invert"
                         alt={logo.alt}
+                        src={logo.src}
                       />
-                    </a>
+                      <IndexedSpan className="text-lg font-semibold tracking-tighter">
+                        {logo.title}
+                      </IndexedSpan>
+                    </IndexedA>
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
+                <IndexedDiv className="my-6 flex flex-col gap-6">
                   <Accordion
                     type="single"
                     collapsible
                     className="flex w-full flex-col gap-4"
                   >
-                    {menu.map((item) => renderMobileMenuItem(item))}
+                    {menu.map((item) => (
+                      <AccordionItem
+                        key={item.title}
+                        value={item.title}
+                        className="border-b-0"
+                      >
+                        <AccordionTrigger className="mb-4 py-0 font-semibold hover:no-underline">
+                          {item.title}
+                        </AccordionTrigger>
+                        <AccordionContent className="mt-2">
+                          {item.items?.map((subItem) => (
+                            <IndexedA
+                              key={subItem.title}
+                              className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              href={subItem.url}
+                            >
+                              {subItem.icon}
+                              <IndexedDiv>
+                                <IndexedDiv className="text-sm font-semibold">
+                                  {subItem.title}
+                                </IndexedDiv>
+                                <IndexedP className="text-sm leading-snug text-muted-foreground">
+                                  {subItem.description}
+                                </IndexedP>
+                              </IndexedDiv>
+                            </IndexedA>
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
                   </Accordion>
-
-                  <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
-                  </div>
-                </div>
+                  <IndexedDiv className="border-t py-4">
+                    <IndexedDiv className="grid grid-cols-2 justify-start gap-2">
+                      {mobileExtraLinks.map((link, idx) => (
+                        <IndexedA
+                          key={idx}
+                          className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                          href={link.url}
+                        >
+                          {link.name}
+                        </IndexedA>
+                      ))}
+                    </IndexedDiv>
+                  </IndexedDiv>
+                  <IndexedDiv className="flex flex-col gap-3">
+                    {user ? (
+                      <>
+                        <Button asChild variant="default" className="w-full bg-green-600 hover:bg-green-700 text-white">
+                          <Link href="/dashboard">Dashboard</Link>
+                        </Button>
+                        <Button asChild variant="outline" className="w-full" onClick={onLogout}>
+                          <IndexedSpan>Log out</IndexedSpan>
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button asChild variant="outline">
+                          <a href={auth.login.url}>{auth.login.text}</a>
+                        </Button>
+                        <Button asChild>
+                          <a href={auth.signup.url}>{auth.signup.text}</a>
+                        </Button>
+                      </>
+                    )}
+                  </IndexedDiv>
+                </IndexedDiv>
               </SheetContent>
             </Sheet>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const renderMenuItem = (item: MenuItem) => {
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="bg-background hover:bg-muted hover:text-accent-foreground group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
-const renderMobileMenuItem = (item: MenuItem) => {
-  return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
-    </a>
-  );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <a
-      className="hover:bg-muted hover:text-accent-foreground flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
-      href={item.url}
-    >
-      <div className="text-foreground">{item.icon}</div>
-      <div>
-        <div className="text-sm font-semibold">{item.title}</div>
-        {item.description && (
-          <p className="text-muted-foreground text-sm leading-snug">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </a>
+          </IndexedDiv>
+        </IndexedDiv>
+      </IndexedDiv>
+    </IndexedSection>
   );
 };
 
