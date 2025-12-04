@@ -1,14 +1,13 @@
 "use client"
 
-import { useRef } from 'react';
+import { useId } from 'react';
 
-// Global counter storage
+// Global counter storage (deprecated, kept for non-React usage if any)
 const componentCounters: Record<string, number> = {};
 
 /**
  * Generates a unique component ID for debugging and inspection
- * Format: component-name-serial-number
- * Example: navbar-1, button-42, card-7
+ * Note: This is NOT stable for SSR/Hydration. Use useComponentId for React components.
  */
 export function generateComponentId(componentName: string): string {
     const key = componentName.toLowerCase();
@@ -21,25 +20,17 @@ export function generateComponentId(componentName: string): string {
 
 /**
  * React hook to generate a stable component ID that persists across re-renders
- * Use this in functional components to get a unique, stable ID
+ * and matches between server and client (fixing hydration mismatches).
  * 
  * @param componentName - Name of the component (e.g., 'Button', 'Card', 'Navbar')
- * @returns Unique component ID (e.g., 'button-1', 'card-5')
- * 
- * @example
- * function MyButton() {
- *   const id = useComponentId('MyButton');
- *   return <button data-component-id={id}>Click me</button>;
- * }
+ * @returns Unique component ID (e.g., 'button-r1', 'card-r5')
  */
 export function useComponentId(componentName: string): string {
-    const idRef = useRef<string | null>(null);
-
-    if (idRef.current === null) {
-        idRef.current = generateComponentId(componentName);
-    }
-
-    return idRef.current;
+    const uniqueId = useId();
+    // React's useId returns tokens surrounded by colons, e.g., ":r1:"
+    // We sanitize it to make it cleaner for DOM attributes
+    const cleanId = uniqueId.replace(/:/g, '');
+    return `${componentName.toLowerCase()}-${cleanId}`;
 }
 
 /**

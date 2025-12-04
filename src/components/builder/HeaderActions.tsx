@@ -1,9 +1,14 @@
 import { useBuilderStore } from '@/store/builderStore'
 import { Button } from '@/components/ui/button'
-import { Undo2, Redo2, Save, Loader2, Check } from 'lucide-react'
+import { Undo2, Redo2, Save, Loader2, Check, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 
-export function HeaderActions() {
+interface HeaderActionsProps {
+    username: string
+    slug: string
+}
+
+export function HeaderActions({ username, slug }: HeaderActionsProps) {
     const undo = useBuilderStore((state) => state.undo)
     const redo = useBuilderStore((state) => state.redo)
     const history = useBuilderStore((state) => state.history)
@@ -44,6 +49,16 @@ export function HeaderActions() {
                     <Redo2 className="h-4 w-4" />
                 </Button>
             </div>
+
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/${username}/${slug}`, '_blank')}
+                title="Preview Page"
+            >
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+            </Button>
 
             <Button
                 size="sm"

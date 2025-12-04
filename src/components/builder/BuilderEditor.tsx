@@ -12,9 +12,15 @@ import { PageRecord } from "@/types/database"
 
 interface BuilderEditorProps {
     page: PageRecord
+    user: {
+        name: string
+        username: string
+        email: string
+        avatar: string
+    }
 }
 
-export function BuilderEditor({ page }: BuilderEditorProps) {
+export function BuilderEditor({ page, user }: BuilderEditorProps) {
     const setCurrentPageId = useBuilderStore(state => state.setCurrentPageId)
     const setPageTitle = useBuilderStore(state => state.setPageTitle)
 
@@ -28,7 +34,7 @@ export function BuilderEditor({ page }: BuilderEditorProps) {
 
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar user={user} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
                     <div className="flex items-center gap-2">
@@ -39,7 +45,7 @@ export function BuilderEditor({ page }: BuilderEditorProps) {
                     <div className="flex items-center gap-2">
                         <PublishToggle pageId={page.id} initialIsPublished={page.is_published} />
                         <Separator orientation="vertical" className="h-4" />
-                        <HeaderActions />
+                        <HeaderActions username={user.username} slug={page.slug} />
                     </div>
                 </header>
                 <div className="flex flex-1 overflow-hidden h-[calc(100vh-4rem)]">

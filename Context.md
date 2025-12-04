@@ -798,6 +798,20 @@ When deploying to production (Vercel):
 - **Phase 0 - Foundation**: Set up Zustand state management, Sonner toasts, and TypeScript types for blocks
 - **Phase 1 - Store Setup**: Created Zustand store with localStorage persistence, block CRUD actions, and selection state
 - **Phase 2 - Canvas & Rendering**: Built Canvas component, BlockRenderer with hybrid styling (inline + Tailwind), integrated into dashboard
+
+### Feature Enhancements (Post-Phase 10)
+- **Image Upload**: Replaced URL input with direct file upload to Supabase Storage (`page-images` bucket).
+- **Text Alignment**: Added Left/Center/Right alignment controls for blocks.
+- **Support System**:
+    - `SupportModal` for submitting tickets.
+    - `linq_db.support_tickets` table.
+    - Server action with user context (email/username).
+- **Feedback System**:
+    - `FeedbackModal` for user feedback.
+    - `linq_db.feedback` table.
+    - Server action with user context.
+- **Sidebar**: Now displays authenticated user's real name, email, and avatar.
+- **Preview**: Added "Preview" button to open the public page in a new tab.
 - **Phase 3 - Block Management**: Added block creation (Heading, Paragraph, Image, Link), selection with visual indicators, canvas deselection
 - **Phase 4 - Properties Panel**: Created editing sidebar with content and basic style controls (font size, colors, padding)
 - **Phase 5 - Deletion & Reordering**: Added delete block, move up/down with smart boundary detection

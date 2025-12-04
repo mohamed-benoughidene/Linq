@@ -25,6 +25,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
         borderColor: block.styles.borderColor,
         borderRadius: block.styles.borderRadius ? `${block.styles.borderRadius}px` : undefined,
         borderStyle: block.styles.borderWidth ? 'solid' : undefined,
+        textAlign: block.styles.textAlign,
     }
 
     // HYBRID STYLING: Tailwind classes for micro-interactions

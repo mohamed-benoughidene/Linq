@@ -11,6 +11,7 @@ export type BlockStyles = {
     borderWidth?: number
     borderColor?: string
     borderRadius?: number
+    textAlign?: 'left' | 'center' | 'right'
 }
 
 export type BlockMicroInteractions = {

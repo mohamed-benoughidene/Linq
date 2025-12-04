@@ -10,7 +10,8 @@ import { useBuilderStore } from '@/store/builderStore'
 import { useDebounceCallback } from 'usehooks-ts'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
-import { Lock, Unlock, ChevronDown } from 'lucide-react'
+import { Lock, Unlock, ChevronDown, Trash2, Upload, Loader2, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react'
+import { uploadImage } from '@/lib/storage'
 import { themes } from '@/lib/themes'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -39,7 +40,8 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
     const componentId = useComponentId("BlockEditor")
     const [isMobile, setIsMobile] = useState(false)
     const [content, setContent] = useState(block.content)
-    const { updateBlock, applyBlockTheme } = useBuilderStore()
+    const { updateBlock, applyBlockTheme, deleteBlock } = useBuilderStore()
+    const [isUploading, setIsUploading] = useState(false)
 
     // Collapsible state
     const [themeOpen, setThemeOpen] = useState(true)
@@ -101,7 +103,7 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
     }
 
     const editorContent = (
-        <div className="space-y-4 h-full overflow-y-auto pr-4">
+        <div className="space-y-4 h-full overflow-y-auto px-4">
             <div className="flex items-center justify-between">
                 <h4 className="font-medium capitalize">Edit {block.type}</h4>
             </div>
@@ -110,14 +112,78 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
             {block.type === 'image' && (
                 <div className="space-y-3">
                     <div className="space-y-2">
-                        <Label htmlFor="imageUrl">Image URL</Label>
-                        <Input
-                            id="imageUrl"
-                            value={block.imageUrl || ''}
-                            onChange={(e) => updateBlock(block.id, { imageUrl: e.target.value })}
-                            placeholder="https://example.com/image.jpg"
-                            className="h-9"
-                        />
+                        <Label>Image</Label>
+
+                        {block.imageUrl ? (
+                            <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                                <img
+                                    src={block.imageUrl}
+                                    alt="Preview"
+                                    className="h-full w-full object-cover"
+                                />
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute right-2 top-2 h-6 w-6"
+                                    onClick={() => updateBlock(block.id, { imageUrl: '' })}
+                                >
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="w-full h-24 border-dashed flex flex-col gap-2"
+                                    disabled={isUploading}
+                                    onClick={() => document.getElementById('image-upload')?.click()}
+                                >
+                                    {isUploading ? (
+                                        <>
+                                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">Uploading...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Upload className="h-6 w-6 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">Click to upload image</span>
+                                        </>
+                                    )}
+                                </Button>
+                                <input
+                                    id="image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (!file) return
+
+                                        setIsUploading(true)
+                                        const url = await uploadImage(file)
+                                        setIsUploading(false)
+
+                                        if (url) {
+                                            updateBlock(block.id, { imageUrl: url })
+                                            toast.success('Image uploaded successfully')
+                                        } else {
+                                            toast.error('Failed to upload image')
+                                        }
+                                    }}
+                                />
+                                <div className="flex items-center gap-2">
+                                    <div className="h-px flex-1 bg-border" />
+                                    <span className="text-[10px] text-muted-foreground uppercase">Or via URL</span>
+                                    <div className="h-px flex-1 bg-border" />
+                                </div>
+                                <Input
+                                    value={block.imageUrl || ''}
+                                    onChange={(e) => updateBlock(block.id, { imageUrl: e.target.value })}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="h-8 text-xs"
+                                />
+                            </div>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="imageDescription">Description (Optional)</Label>
@@ -381,6 +447,35 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                                             <option value="700">Bold (700)</option>
                                         </select>
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs">Alignment</Label>
+                                        <div className="flex items-center gap-1 border rounded-md p-1">
+                                            <Button
+                                                variant={block.styles.textAlign === 'left' ? 'secondary' : 'ghost'}
+                                                size="sm"
+                                                className="flex-1 h-7 px-0"
+                                                onClick={() => handleStyleChange('textAlign', 'left')}
+                                            >
+                                                <AlignLeft className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={block.styles.textAlign === 'center' ? 'secondary' : 'ghost'}
+                                                size="sm"
+                                                className="flex-1 h-7 px-0"
+                                                onClick={() => handleStyleChange('textAlign', 'center')}
+                                            >
+                                                <AlignCenter className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant={block.styles.textAlign === 'right' ? 'secondary' : 'ghost'}
+                                                size="sm"
+                                                className="flex-1 h-7 px-0"
+                                                onClick={() => handleStyleChange('textAlign', 'right')}
+                                            >
+                                                <AlignRight className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </SidebarMenuSub>
                             </CollapsibleContent>
                         </SidebarMenuItem>
@@ -514,6 +609,22 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
                         </SidebarMenuItem>
                     </Collapsible>
                 </SidebarMenu>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="border-t pt-4 mt-4 pb-8">
+                <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => {
+                        deleteBlock(block.id)
+                        onOpenChange(false)
+                        toast.success('Block deleted')
+                    }}
+                >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Block
+                </Button>
             </div>
         </div >
     )

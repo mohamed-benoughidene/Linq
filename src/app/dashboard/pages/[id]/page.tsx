@@ -23,5 +23,18 @@ export default async function BuilderPage({ params }: BuilderPageProps) {
 
     if (error || !page) notFound();
 
-    return <BuilderEditor page={page as PageRecord} />;
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, full_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+    const userData = {
+        name: profile?.full_name || profile?.username || 'User',
+        username: profile?.username || 'user',
+        email: user.email || '',
+        avatar: profile?.avatar_url || '',
+    };
+
+    return <BuilderEditor page={page as PageRecord} user={userData} />;
 }

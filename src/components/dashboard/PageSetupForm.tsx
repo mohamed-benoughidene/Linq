@@ -50,7 +50,7 @@ export function PageSetupForm() {
                 <CardTitle>Create New Page</CardTitle>
                 <CardDescription>Give your page a title and a unique URL.</CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="title">Page Title</Label>
@@ -68,7 +68,6 @@ export function PageSetupForm() {
                     <div className="space-y-2">
                         <Label htmlFor="slug">URL Slug</Label>
                         <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground text-sm">linq.com/username/</span>
                             <Input
                                 id="slug"
                                 placeholder="my-page"
@@ -81,7 +80,7 @@ export function PageSetupForm() {
                         )}
                     </div>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
+                <CardFooter className="flex justify-end gap-4">
                     <Button
                         type="button"
                         variant="ghost"

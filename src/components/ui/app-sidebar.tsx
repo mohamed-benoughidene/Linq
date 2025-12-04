@@ -28,25 +28,15 @@ import { BlockType, Block } from "@/types/builder"
 import { toast } from "sonner"
 import { ThemesSection } from "@/components/builder/ThemesSection"
 import { MicroInteractionsSection } from "@/components/builder/MicroInteractionsSection"
+import { SupportModal } from "@/components/dashboard/SupportModal"
+import { FeedbackModal } from "@/components/dashboard/FeedbackModal"
 
-const data = {
+const userData = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
 }
 
 import { getContrastTextColor } from "@/lib/colorUtils"
@@ -83,9 +73,32 @@ function createDefaultBlock(type: BlockType): Block {
 
 import { Indexed, IndexedA, IndexedSpan } from "@/components/ui/indexed-primitives"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & {
+  user: {
+    name: string
+    email: string
+    avatar: string
+  }
+}) {
   const [addBlockModalOpen, setAddBlockModalOpen] = React.useState(false)
+  const [supportModalOpen, setSupportModalOpen] = React.useState(false)
+  const [feedbackModalOpen, setFeedbackModalOpen] = React.useState(false)
   const { addBlock } = useBuilderStore()
+
+  const navSecondary = [
+    {
+      title: "Support",
+      url: "#",
+      icon: LifeBuoy,
+      onClick: () => setSupportModalOpen(true),
+    },
+    {
+      title: "Feedback",
+      url: "#",
+      icon: Send,
+      onClick: () => setFeedbackModalOpen(true),
+    },
+  ]
 
   const handleSelectBlock = (type: BlockType) => {
     const newBlock = createDefaultBlock(type)
@@ -143,10 +156,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroup>
 
-          <NavSecondary items={data.navSecondary} className="mt-auto" />
+          <NavSecondary items={navSecondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <NavUser user={user} />
         </SidebarFooter>
       </Sidebar>
 
@@ -154,6 +167,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         open={addBlockModalOpen}
         onOpenChange={setAddBlockModalOpen}
         onSelectBlock={handleSelectBlock}
+      />
+      <SupportModal
+        open={supportModalOpen}
+        onOpenChange={setSupportModalOpen}
+      />
+      <FeedbackModal
+        open={feedbackModalOpen}
+        onOpenChange={setFeedbackModalOpen}
       />
     </>
   )
