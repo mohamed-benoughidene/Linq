@@ -27,6 +27,7 @@ import { useBuilderStore } from "@/store/builderStore"
 import { BlockType, Block } from "@/types/builder"
 import { toast } from "sonner"
 import { ThemesSection } from "@/components/builder/ThemesSection"
+import { PageBackgroundSection } from "@/components/builder/PageBackgroundSection"
 import { MicroInteractionsSection } from "@/components/builder/MicroInteractionsSection"
 import { SupportModal } from "@/components/dashboard/SupportModal"
 import { FeedbackModal } from "@/components/dashboard/FeedbackModal"
@@ -54,6 +55,7 @@ function createDefaultBlock(type: BlockType): Block {
       backgroundColor: defaultBgColor,
       margin: 8,
       padding: 8,
+      textAlign: type === 'link' ? 'center' : 'left',
     },
     microInteractions: {
       hover: '',
@@ -147,6 +149,9 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
           <SidebarGroup>
             <SidebarGroupLabel>Design</SidebarGroupLabel>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <PageBackgroundSection />
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <ThemesSection />
               </SidebarMenuItem>

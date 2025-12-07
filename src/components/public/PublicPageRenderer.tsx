@@ -4,6 +4,7 @@ import { Block } from '@/types/builder';
 import { cn } from '@/lib/utils';
 import { PageWithProfile } from '@/types/database';
 import { useComponentId } from '@/lib/component-id';
+import { buildBackgroundStyle } from '@/lib/gradientUtils';
 
 interface PublicPageRendererProps {
     page: PageWithProfile;
@@ -11,8 +12,14 @@ interface PublicPageRendererProps {
 
 export function PublicPageRenderer({ page }: PublicPageRendererProps) {
     const componentId = useComponentId("PublicPageRenderer")
+    const backgroundStyle = buildBackgroundStyle(page.global_theme.pageBackground || { type: 'color', color: page.global_theme.colors.background })
+
     return (
-        <div className="min-h-screen bg-background" data-component-id={componentId}>
+        <div
+            className="min-h-screen bg-background transition-colors duration-300"
+            style={backgroundStyle}
+            data-component-id={componentId}
+        >
             {/* Header */}
             <header className="border-b">
                 <div className="container max-w-4xl mx-auto py-6 px-4">
@@ -57,10 +64,12 @@ export function PublicPageRenderer({ page }: PublicPageRendererProps) {
 
 function PublicBlockRenderer({ block }: { block: Block }) {
     const componentId = useComponentId("PublicBlockRenderer")
+    const backgroundStyle = buildBackgroundStyle(block.backgroundConfig || { type: 'color', color: block.styles.backgroundColor })
+
     const combinedStyles = {
+        ...backgroundStyle,
         fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
         color: block.styles.color,
-        backgroundColor: block.styles.backgroundColor,
         fontFamily: block.styles.fontFamily,
         fontWeight: block.styles.fontWeight,
         margin: block.styles.margin ? `${block.styles.margin}px` : undefined,
@@ -69,6 +78,7 @@ function PublicBlockRenderer({ block }: { block: Block }) {
         borderColor: block.styles.borderColor,
         borderRadius: block.styles.borderRadius ? `${block.styles.borderRadius}px` : undefined,
         borderStyle: block.styles.borderWidth ? 'solid' : undefined,
+        textAlign: (block.styles.textAlign as any) || (block.type === 'link' ? 'center' : 'left'),
     };
 
     const className = cn(
@@ -100,7 +110,7 @@ function PublicBlockRenderer({ block }: { block: Block }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={combinedStyles}
-                    className={className}
+                    className={cn(className, 'block text-center')}
                     data-component-id={componentId}
                 >
                     {block.linkText || block.content || 'Link'}

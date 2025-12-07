@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { SidebarMenuButton, SidebarMenuSub } from '@/components/ui/sidebar'
 import { Button } from '@/components/ui/button'
-import { Palette } from 'lucide-react'
+import { Palette, ChevronDown } from 'lucide-react'
 import { themes } from '@/lib/themes'
 import { useBuilderStore } from '@/store/builderStore'
 import { toast } from 'sonner'
 
 export function ThemesSection() {
-    const { applyGlobalTheme } = useBuilderStore()
+    const { applyGlobalTheme, globalTheme } = useBuilderStore()
     const [selectedTheme, setSelectedTheme] = useState<string>('minimal')
 
     const handleApplyTheme = () => {
@@ -28,7 +28,12 @@ export function ThemesSection() {
             <CollapsibleTrigger asChild>
                 <SidebarMenuButton>
                     <Palette className="mr-2 h-4 w-4" />
-                    Themes
+                    <span>Themes</span>
+                    <div
+                        className="h-3 w-3 rounded-full border shadow-sm ml-auto mr-0 bg-background"
+                        style={{ backgroundColor: globalTheme.colors.primary }}
+                    />
+                    <ChevronDown className="ml-2 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                 </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>

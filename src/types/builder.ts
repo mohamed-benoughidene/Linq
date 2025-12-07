@@ -37,6 +37,46 @@ export type Block = {
     // Link-specific fields
     linkUrl?: string
     linkText?: string
+
+    // Background Customization
+    backgroundConfig?: BackgroundConfig
+}
+
+export type BackgroundType = 'color' | 'gradient' | 'pattern' | 'none'
+
+export type BackgroundConfig = {
+    type: BackgroundType
+
+    // Solid Color
+    color?: string
+
+    // Gradient
+    gradient?: GradientConfig
+
+    // Pattern
+    pattern?: PatternConfig
+}
+
+export type GradientType = 'linear' | 'radial' | 'conic'
+
+export type GradientStop = {
+    color: string
+    position: number // 0-100
+}
+
+export type GradientConfig = {
+    type: GradientType
+    angle?: number // 0-360 for linear
+    stops: GradientStop[]
+}
+
+export type PatternConfig = {
+    id: string
+    color?: string // Foreground color of the pattern shapes
+    backgroundColor?: string // Background color behind the pattern
+    opacity?: number // 0-100
+    scale?: number // 50-200
+    rotation?: number // 0-360
 }
 
 export type GlobalTheme = {
@@ -52,6 +92,8 @@ export type GlobalTheme = {
         headingSize: number
         bodySize: number
     }
+    // Page-level background
+    pageBackground?: BackgroundConfig
 }
 
 export type HistoryState = {

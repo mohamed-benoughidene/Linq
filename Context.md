@@ -799,6 +799,16 @@ When deploying to production (Vercel):
 - **Phase 1 - Store Setup**: Created Zustand store with localStorage persistence, block CRUD actions, and selection state
 - **Phase 2 - Canvas & Rendering**: Built Canvas component, BlockRenderer with hybrid styling (inline + Tailwind), integrated into dashboard
 
+### Background Customization & UI Polish (Phase 11)
+- **Page Backgrounds**: Implemented global page background settings (Solid, Gradient, Pattern) persisted in `GlobalTheme`.
+- **Theme Sync**: Selecting a global theme now automatically updates the page background to match.
+- **UI Refactoring**: 
+    - Created reusable `BackgroundControls` component.
+    - Updated Sidebar UI for "Themes" and "Micro Interactions" to match the visual style of "Page Background" (preview dots, animated chevrons).
+- **Link Block Polish**: 
+    - Fixed Link block rendering to behave like a block-level element (full width button style vs inline text).
+    - Adjusted default styling (centered text, consistent padding) to match other block types.
+
 ### Feature Enhancements (Post-Phase 10)
 - **Image Upload**: Replaced URL input with direct file upload to Supabase Storage (`page-images` bucket).
 - **Text Alignment**: Added Left/Center/Right alignment controls for blocks.

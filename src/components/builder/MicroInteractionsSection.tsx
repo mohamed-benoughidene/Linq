@@ -6,15 +6,18 @@ import { SidebarMenuButton, SidebarMenuSub } from '@/components/ui/sidebar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ChevronDown } from 'lucide-react'
 import { useBuilderStore } from '@/store/builderStore'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 export function MicroInteractionsSection() {
-    const { applyGlobalMicroInteractions } = useBuilderStore()
+    const { applyGlobalMicroInteractions, globalMicroInteractions } = useBuilderStore()
     const [hover, setHover] = useState('')
     const [click, setClick] = useState('')
     const [scroll, setScroll] = useState('')
+
+    const hasActiveInteractions = globalMicroInteractions.hover || globalMicroInteractions.click || globalMicroInteractions.scroll
 
     const handleApply = () => {
         applyGlobalMicroInteractions({ hover, click, scroll })
@@ -28,7 +31,11 @@ export function MicroInteractionsSection() {
             <CollapsibleTrigger asChild>
                 <SidebarMenuButton>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Micro Interactions
+                    <span>Micro Interactions</span>
+                    {hasActiveInteractions && (
+                        <div className="h-2 w-2 rounded-full bg-primary ml-auto mr-0" />
+                    )}
+                    <ChevronDown className={cn("ml-2 transition-transform group-data-[state=open]/collapsible:rotate-180", !hasActiveInteractions && "ml-auto")} />
                 </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>

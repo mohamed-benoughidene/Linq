@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sidebar'
 import { getContrastTextColor } from '@/lib/colorUtils'
 import { useComponentId } from '@/lib/component-id'
+import { BackgroundSection } from './BackgroundSection'
 
 interface BlockEditorProps {
     block: Block
@@ -40,7 +41,7 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
     const componentId = useComponentId("BlockEditor")
     const [isMobile, setIsMobile] = useState(false)
     const [content, setContent] = useState(block.content)
-    const { updateBlock, applyBlockTheme, deleteBlock } = useBuilderStore()
+    const { updateBlock, applyBlockTheme, deleteBlock, updateBlockBackground } = useBuilderStore()
     const [isUploading, setIsUploading] = useState(false)
 
     // Collapsible state
@@ -526,37 +527,13 @@ export function BlockEditor({ block, open, onOpenChange, children }: BlockEditor
             </div>
 
             {/* Background Section - SidebarMenu */}
-            <div className="border-t pt-4">
-                <SidebarMenu>
-                    <Collapsible open={bgOpen} onOpenChange={setBgOpen} className="group/collapsible">
-                        <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                                <SidebarMenuButton>
-                                    <span>Background</span>
-                                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                </SidebarMenuButton>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                <SidebarMenuSub className="px-4 py-2 space-y-3">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="backgroundColor" className="text-xs">Background Color</Label>
-                                        <input
-                                            id="backgroundColor"
-                                            type="color"
-                                            value={block.styles.backgroundColor || '#ffffff'}
-                                            onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
-                                            className="h-9 w-full rounded-md border border-input"
-                                        />
-                                        <p className="text-xs text-muted-foreground">
-                                            Text color will auto-adjust for contrast
-                                        </p>
-                                    </div>
-                                </SidebarMenuSub>
-                            </CollapsibleContent>
-                        </SidebarMenuItem>
-                    </Collapsible>
-                </SidebarMenu>
-            </div>
+            <BackgroundSection
+                block={block}
+                open={bgOpen}
+                onOpenChange={setBgOpen}
+                onUpdate={updateBlockBackground}
+                onLegacyUpdate={(property, value) => handleStyleChange(property as any, value)}
+            />
 
 
             {/* Border Section - SidebarMenu */}

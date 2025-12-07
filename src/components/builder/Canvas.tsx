@@ -5,10 +5,12 @@ import { BlockRenderer } from './BlockRenderer'
 import { BlockEditor } from './BlockEditor'
 import { useEffect } from 'react'
 import { useComponentId } from '@/lib/component-id'
+import { buildBackgroundStyle } from '@/lib/gradientUtils'
 
 export function Canvas() {
     const componentId = useComponentId("Canvas")
-    const { blocks, selectedBlockId, selectBlock, undo, redo } = useBuilderStore()
+    const { blocks, selectedBlockId, selectBlock, undo, redo, globalTheme } = useBuilderStore()
+    const backgroundStyle = buildBackgroundStyle(globalTheme.pageBackground || { type: 'color', color: globalTheme.colors.background })
 
     useEffect(() => {
         // Expose store to window for debugging/testing
@@ -50,7 +52,11 @@ export function Canvas() {
     }, [undo, redo])
 
     return (
-        <div className="canvas min-h-screen bg-background p-8" data-component-id={componentId}>
+        <div
+            className="canvas min-h-screen bg-background p-8 transition-colors duration-300"
+            style={backgroundStyle}
+            data-component-id={componentId}
+        >
             <div className="max-w-4xl mx-auto space-y-4">
                 {blocks.length === 0 ? (
                     <p className="text-muted-foreground text-center">

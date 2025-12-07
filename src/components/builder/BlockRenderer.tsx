@@ -4,6 +4,7 @@ import { Block } from '@/types/builder'
 import { cn } from '@/lib/utils'
 import { ImageIcon } from 'lucide-react'
 import { useComponentId } from '@/lib/component-id'
+import { buildBackgroundStyle } from '@/lib/gradientUtils'
 
 interface BlockRendererProps {
     block: Block
@@ -12,11 +13,15 @@ interface BlockRendererProps {
 
 export function BlockRenderer({ block, onClick }: BlockRendererProps) {
     const componentId = useComponentId("BlockRenderer")
+    const backgroundStyle = buildBackgroundStyle(block.backgroundConfig || { type: 'color', color: block.styles.backgroundColor })
+
     // HYBRID STYLING: Inline for custom values
     const combinedStyles = {
+        ...backgroundStyle,
         fontSize: block.styles.fontSize ? `${block.styles.fontSize}px` : undefined,
         color: block.styles.color,
-        backgroundColor: block.styles.backgroundColor,
+        // Remove direct backgroundColor assignment as it's handled by buildBackgroundStyle (via backgroundConfig)
+        // But keep fallback if needed (though buildBackgroundStyle handles it)
         fontFamily: block.styles.fontFamily,
         fontWeight: block.styles.fontWeight,
         margin: block.styles.margin ? `${block.styles.margin}px` : undefined,
@@ -25,7 +30,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
         borderColor: block.styles.borderColor,
         borderRadius: block.styles.borderRadius ? `${block.styles.borderRadius}px` : undefined,
         borderStyle: block.styles.borderWidth ? 'solid' : undefined,
-        textAlign: block.styles.textAlign,
+        textAlign: block.styles.textAlign || (block.type === 'link' ? 'center' : 'left'),
     }
 
     // HYBRID STYLING: Tailwind classes for micro-interactions
@@ -84,7 +89,7 @@ export function BlockRenderer({ block, onClick }: BlockRendererProps) {
                 <a
                     href={url}
                     style={combinedStyles}
-                    className={className}
+                    className={cn(className, 'block text-center')}
                     onClick={(e) => {
                         // Prevent navigation when editing
                         e.preventDefault()
