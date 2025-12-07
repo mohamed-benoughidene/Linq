@@ -16,6 +16,7 @@ function createIndexedPrimitive<T extends React.ElementType>(
             <Component
                 ref={ref}
                 data-component-id={componentId}
+                suppressHydrationWarning={true}
                 {...props}
             />
         )

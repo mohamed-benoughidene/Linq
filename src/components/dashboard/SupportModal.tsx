@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useState, useEffect, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -43,7 +43,7 @@ function SubmitButton() {
 
 export function SupportModal({ open, onOpenChange }: SupportModalProps) {
     const componentId = useComponentId("SupportModal")
-    const [state, formAction] = useFormState(createTicket, {})
+    const [state, formAction] = useActionState(createTicket, {})
 
     useEffect(() => {
         if (state.success) {

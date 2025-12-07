@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useEffect, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -11,7 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -23,8 +23,8 @@ import {
 } from '@/components/ui/select'
 import { createFeedback } from '@/app/actions/feedback'
 import { toast } from 'sonner'
-import { Loader2, Star } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
+
 import { useComponentId } from '@/lib/component-id'
 
 interface FeedbackModalProps {
@@ -44,7 +44,7 @@ function SubmitButton() {
 
 export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
     const componentId = useComponentId("FeedbackModal")
-    const [state, formAction] = useFormState(createFeedback, {})
+    const [state, formAction] = useActionState(createFeedback, {})
 
     useEffect(() => {
         if (state.success) {
