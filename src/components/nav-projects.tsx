@@ -1,0 +1,45 @@
+"use client"
+
+import {
+  type LucideIcon,
+} from "lucide-react"
+
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
+
+export function NavProjects({
+  projects,
+}: {
+  projects: {
+    name: string
+    url: string
+    icon: LucideIcon
+  }[]
+}) {
+
+
+  return (
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <SidebarGroupLabel className="tracking-tight">Support</SidebarGroupLabel>
+      <SidebarMenu>
+        {projects.map((item) => (
+          <SidebarMenuItem key={item.name}>
+            <SidebarMenuButton asChild tooltip={item.name} data-id={`sidebar-nav-projects-item-${item.name}`}>
+              <a href={item.url}>
+                <item.icon className="text-slate-600" />
+                <span>{item.name}</span>
+              </a>
+            </SidebarMenuButton>
+
+          </SidebarMenuItem>
+        ))}
+
+      </SidebarMenu>
+    </SidebarGroup>
+  )
+}
