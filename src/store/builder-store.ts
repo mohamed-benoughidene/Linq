@@ -18,7 +18,21 @@ export interface PageSettings {
     // Integrations & Compliance
     googleAnalyticsId?: string
     metaPixelId?: string
+
     cookieBanner: boolean
+}
+
+export interface AnalyticsStats {
+    totalViews: number
+    totalClicks: number
+    ctr: string
+    history: { date: string; views: number; clicks: number }[]
+    topLinks: { id: string; title: string; clicks: number }[]
+}
+
+export interface HistoryState {
+    past: BuilderBlock[][]
+    future: BuilderBlock[][]
 }
 
 export interface BuilderBlock {
@@ -68,35 +82,153 @@ export interface BuilderBlock {
     }
 }
 
-interface BuilderState {
+export interface Page {
+    id: string
+    name: string
+    slug: string
+    blocks: BuilderBlock[]
+    currentTheme: ThemePreset
+    pageSettings: PageSettings
+    history: HistoryState
+}
+
+export interface BuilderState {
+    // Multi-Page
+    pages: Page[]
+    activePageId: string
+    createPage: (name: string, slug: string) => void
+    setActivePage: (id: string) => void
+
+    // Active Page State (Computed/Proxied getters would be ideal, but for Zustand we sync)
+    // Actually, to avoid massive refactoring of all components, we can keep the "current" state
+    // as the source of truth for the UI, and "snapshots" in the pages array.
+    // When switching pages, we save current -> pages[old], and load pages[new] -> current.
+
     blocks: BuilderBlock[]
     addBlock: (type: BuilderBlock['type']) => void
-    updateBlock: (id: string, data: Partial<BuilderBlock['content']>) => void
     removeBlock: (id: string) => void
+    updateBlock: (id: string, data: Partial<BuilderBlock['content']>) => void
     updateLayout: (newLayouts: Layout[]) => void
-    activePanel: 'none' | 'themes' | 'settings'
-    setActivePanel: (panel: 'none' | 'themes' | 'settings') => void
-    togglePanel: (panel: 'themes' | 'settings') => void
+    reorderBlocks: (newBlocks: BuilderBlock[]) => void
+
     currentTheme: ThemePreset
-    setTheme: (themeId: string) => void
-    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => void
+    setTheme: (theme: ThemePreset) => void
+
     pageSettings: PageSettings
     updatePageSettings: (settings: Partial<PageSettings>) => void
 
-    // Support Modal
+    activePanel: 'blocks' | 'settings' | 'themes' | null
+    setActivePanel: (panel: 'blocks' | 'settings' | 'themes' | null) => void
+    togglePanel: (panel: 'blocks' | 'settings' | 'themes') => void
+
     isSupportOpen: boolean
     openSupport: () => void
     closeSupport: () => void
+
+    isCreatePageOpen: boolean
+    openCreatePage: () => void
+    closeCreatePage: () => void
+
+    // Analytics
+    view: 'editor' | 'analytics'
+    setView: (view: 'editor' | 'analytics') => void
+    stats: AnalyticsStats
+
+    // History (Undo/Redo)
+    history: HistoryState
+    undo: () => void
+    redo: () => void
+    pushToHistory: () => void
 }
 
-export const useBuilderStore = create<BuilderState>((set) => ({
+const DEFAULT_THEME = THEMES[0]
+const DEFAULT_SETTINGS = {
+    slug: 'my-page',
+    seoTitle: 'My Linq Page',
+    seoDescription: 'Welcome to my page',
+    cookieBanner: true
+}
+
+export const useBuilderStore = create<BuilderState>((set, get) => ({
+    // Initial Pages
+    pages: [
+        {
+            id: 'default',
+            name: 'My Personal Page',
+            slug: 'my-page',
+            blocks: [], // will be populated
+            currentTheme: DEFAULT_THEME,
+            pageSettings: DEFAULT_SETTINGS,
+            history: { past: [], future: [] }
+        }
+    ],
+    activePageId: 'default',
+
+    // Active State (Initialized with default)
     blocks: [],
-    currentTheme: THEMES[0],
-    pageSettings: {
-        slug: 'my-page',
-        seoTitle: 'My Personal Page',
-        seoDescription: 'Check out my links and bio.',
-        cookieBanner: true,
+    currentTheme: DEFAULT_THEME,
+    pageSettings: DEFAULT_SETTINGS,
+    history: { past: [], future: [] },
+
+    createPage: (name, slug) => {
+        const { pages, activePageId, blocks, currentTheme, pageSettings, history } = get()
+
+        // 1. Save current state to the active page in the array
+        const updatedPages = pages.map(p =>
+            p.id === activePageId
+                ? { ...p, blocks, currentTheme, pageSettings, history }
+                : p
+        )
+
+        // 2. Create new page
+        const newPage: Page = {
+            id: crypto.randomUUID(),
+            name,
+            slug,
+            blocks: [],
+            currentTheme: DEFAULT_THEME,
+            pageSettings: { ...DEFAULT_SETTINGS, slug },
+            history: { past: [], future: [] }
+        }
+
+        // 3. Update state
+        set({
+            pages: [...updatedPages, newPage],
+            activePageId: newPage.id,
+            // Reset Active State
+            blocks: [],
+            currentTheme: DEFAULT_THEME,
+            pageSettings: { ...DEFAULT_SETTINGS, slug },
+            history: { past: [], future: [] },
+            view: 'editor' // Force switch to editor
+        })
+    },
+
+    setActivePage: (id) => {
+        const { pages, activePageId, blocks, currentTheme, pageSettings, history } = get()
+        if (id === activePageId) return
+
+        // 1. Save current state
+        const updatedPages = pages.map(p =>
+            p.id === activePageId
+                ? { ...p, blocks, currentTheme, pageSettings, history }
+                : p
+        )
+
+        // 2. Find new page
+        const targetPage = updatedPages.find(p => p.id === id)
+        if (!targetPage) return
+
+        // 3. Load state
+        set({
+            pages: updatedPages,
+            activePageId: id,
+            blocks: targetPage.blocks,
+            currentTheme: targetPage.currentTheme,
+            pageSettings: targetPage.pageSettings,
+            history: targetPage.history,
+            view: 'editor'
+        })
     },
 
     updatePageSettings: (settings) => {
@@ -108,14 +240,11 @@ export const useBuilderStore = create<BuilderState>((set) => ({
         }))
     },
 
-    setTheme: (themeId: string) => {
-        const theme = THEMES.find((t) => t.id === themeId)
-        if (theme) {
-            set({ currentTheme: theme })
-        }
+    setTheme: (theme) => {
+        set({ currentTheme: theme })
     },
 
-    updateThemeProperty: (section, key, value) => {
+    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => {
         set((state) => ({
             currentTheme: {
                 ...state.currentTheme,
@@ -230,27 +359,17 @@ export const useBuilderStore = create<BuilderState>((set) => ({
         }))
     },
 
-    updateBlock: (id: string, data: Partial<BuilderBlock['content']>) => {
-        set((state) => ({
-            blocks: state.blocks.map((block) =>
-                block.id === id
-                    ? { ...block, content: { ...block.content, ...data } }
-                    : block
-            ),
-        }))
-    },
 
-    removeBlock: (id: string) => {
-        set((state) => ({
-            blocks: state.blocks.filter((block) => block.id !== id),
-        }))
-    },
 
     updateLayout: (newLayouts: Layout[]) => {
-        set((state) => {
-            // Create a map for faster lookup
-            const layoutMap = new Map(newLayouts.map(l => [l.i, l]))
+        const { pushToHistory } = get()
+        // We might want to debounce history push here or trust the component's debounce.
+        // The component is debouncing the call to this function (200ms).
+        // So we can treat each call as a history point.
+        pushToHistory()
 
+        set((state) => {
+            const layoutMap = new Map(newLayouts.map(l => [l.i, l]))
             return {
                 blocks: state.blocks.map(block => {
                     const newLayout = layoutMap.get(block.id)
@@ -272,13 +391,116 @@ export const useBuilderStore = create<BuilderState>((set) => ({
         })
     },
 
-    activePanel: 'none',
+    reorderBlocks: (newBlocks: BuilderBlock[]) => {
+        const { pushToHistory } = get()
+        pushToHistory()
+        set({ blocks: newBlocks })
+    },
+
+    updateBlock: (id: string, data: Partial<BuilderBlock['content']>) => {
+        const { pushToHistory } = get()
+        pushToHistory()
+        set((state) => ({
+            blocks: state.blocks.map((block) =>
+                block.id === id
+                    ? { ...block, content: { ...block.content, ...data } }
+                    : block
+            ),
+        }))
+    },
+
+    removeBlock: (id) => {
+        const { pushToHistory } = get()
+        pushToHistory()
+        set((state) => ({
+            blocks: state.blocks.filter((block) => block.id !== id),
+        }))
+    },
+
+    activePanel: null,
     setActivePanel: (panel) => set({ activePanel: panel }),
     togglePanel: (panel) => set((state) => ({
-        activePanel: state.activePanel === panel ? 'none' : panel
+        activePanel: state.activePanel === panel ? null : panel
     })),
 
     isSupportOpen: false,
     openSupport: () => set({ isSupportOpen: true }),
     closeSupport: () => set({ isSupportOpen: false }),
+
+    isCreatePageOpen: false,
+    openCreatePage: () => set({ isCreatePageOpen: true }),
+    closeCreatePage: () => set({ isCreatePageOpen: false }),
+
+    view: 'editor',
+    setView: (view) => set({ view }),
+
+    stats: {
+        totalViews: 12450,
+        totalClicks: 850,
+        ctr: '6.8%',
+        history: [
+            { date: 'Mon', views: 120, clicks: 10 },
+            { date: 'Tue', views: 240, clicks: 45 },
+            { date: 'Wed', views: 180, clicks: 30 },
+            { date: 'Thu', views: 320, clicks: 65 },
+            { date: 'Fri', views: 450, clicks: 90 },
+            { date: 'Sat', views: 520, clicks: 110 },
+            { date: 'Sun', views: 600, clicks: 130 },
+        ],
+        topLinks: [
+            { id: '1', title: 'My Portfolio', clicks: 340 },
+            { id: '2', title: 'YouTube Channel', clicks: 120 },
+            { id: '3', title: 'Book a Call', clicks: 85 },
+        ]
+    },
+
+    // History Implementation defined above at line 166, actions below
+
+
+    pushToHistory: () => {
+        set((state) => {
+            // Keep only last 50 states to prevent memory issues
+            const newPast = [...state.history.past, state.blocks].slice(-50)
+            return {
+                history: {
+                    past: newPast,
+                    future: [] // Clear future on new action
+                }
+            }
+        })
+    },
+
+    undo: () => {
+        set((state) => {
+            if (state.history.past.length === 0) return state
+
+            const previous = state.history.past[state.history.past.length - 1]
+            const newPast = state.history.past.slice(0, -1)
+
+            return {
+                blocks: previous,
+                history: {
+                    past: newPast,
+                    future: [state.blocks, ...state.history.future]
+                }
+            }
+        })
+    },
+
+    redo: () => {
+        set((state) => {
+            if (state.history.future.length === 0) return state
+
+            const next = state.history.future[0]
+            const newFuture = state.history.future.slice(1)
+
+            return {
+                blocks: next,
+                history: {
+                    past: [...state.history.past, state.blocks],
+                    future: newFuture
+                }
+            }
+        })
+    }
 }))

@@ -7,6 +7,7 @@ import { ThemesPanel } from "@/components/builder/panels/themes-panel"
 import { SettingsPanel } from "@/components/builder/panels/settings-panel"
 import { SidebarSync } from "@/components/dashboard/sidebar-sync"
 import { SupportDialog } from "@/components/dashboard/support-dialog"
+import { CreatePageDialog } from "@/components/dashboard/modals/create-page-dialog"
 import { cn } from "@/lib/utils"
 
 export default function DashboardLayout({
@@ -19,12 +20,13 @@ export default function DashboardLayout({
     // Determine panel width
     // If activePanel is 'none', width is 0.
     // Otherwise it's 218px (approx 15% less than 16rem/256px sidebar).
-    const panelWidth = activePanel === 'none' ? '0px' : activePanel === 'settings' ? '20rem' : '16rem'
+    const panelWidth = activePanel === null ? '0px' : activePanel === 'settings' ? '20rem' : '16rem'
 
     return (
         <SidebarProvider defaultOpen={true}>
             <SidebarSync />
             <SupportDialog />
+            <CreatePageDialog />
             <div className="flex h-screen w-full overflow-hidden bg-slate-50">
                 {/* Column 1: Main Nav (Fixed Sidebar) */}
                 <div className="z-20 h-full flex-shrink-0">

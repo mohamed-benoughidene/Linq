@@ -26,10 +26,10 @@ export function ThemesPanel() {
     const [activeTab, setActiveTab] = React.useState("presets")
 
     const handlePresetSelect = (themeId: string) => {
-        setTheme(themeId)
-        // Ensure we preserve the tab selection or maybe stay on presets?
-        // Requirement: "When a user clicks a "Preset" (Tab 1), it overwrites the "Custom" values."
-        // This is handled by setTheme in the store which replaces the whole object.
+        const theme = THEMES.find(t => t.id === themeId)
+        if (theme) {
+            setTheme(theme)
+        }
     }
 
     return (

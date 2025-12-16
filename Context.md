@@ -4,9 +4,9 @@
 **Objective:** Maintain `Context.md` as the absolute source of truth for the project state, architecture, and "gotchas."
 
 ## 1. Project Status
-* **Phase:** Phase 2: Page Settings & User Support
-* **Current Focus:** Polishing Settings logic (DNS verification) and Support workflow.
-* **Last Update:** 2025-12-16 15:05
+* **Phase:** Phase 3: Multi-Page & Core UX
+* **Current Focus:** Handling complex user flows (Multi-page switching, Undo/Redo, Sharing).
+* **Last Update:** 2025-12-16 16:10
 
 ## 2. Technical Decisions (The "Why")
 - [2025-12-12] **Framework:** Next.js 16.0.10 (App Router) + React 19.2.1 for latest features and performance.
@@ -21,6 +21,9 @@
 - [2025-12-16] **Page Settings:** Implemented comprehensive settings panel for SEO, Social Previews, and Domain configuration.
 - [2025-12-16] **DNS Workflow:** Standardized Custom Domain DNS setup to require both **A Record** (root) and **CNAME** (www) for full coverage.
 - [2025-12-16] **Support System:** Implemented a global `SupportDialog` driven by `zustand` state to provide immediate feedback/help access via the `AppSidebar`.
+- [2025-12-16] **Multi-Page State:** `activePageId` drives the UI. When switching, valid state is snapshot to `pages` array.
+- [2025-12-16] **Undo/Redo:** Implemented manual History Stack (`past`, `future`) in Zustand to avoid library overhead for simple block arrays.
+- [2025-12-16] **Global Modals:** `CreatePageDialog` is lifted to `DashboardLayout` and controlled via `useBuilderStore` to allow triggering from Sidebar or other constrained contexts.
 
 ## 3. Architecture Map
 * **Database:** Supabase (Pending setup).
@@ -29,16 +32,19 @@
     * `/dashboard` - `src/app/dashboard/page.tsx`
 * **Key Components:**
     * **Sidebar:** `AppSidebar` (src/components/app-sidebar.tsx) - Main navigation using Shadcn Sidebar.
+    * **Navigation:** `PageSwitcher` (src/components/dashboard/page-switcher.tsx) - Replaces TeamSwitcher for page navigation.
     * **Builder:**
         * `BuilderCanvas` (src/components/builder/builder-canvas.tsx) - The main drag-and-drop area.
+        * `TopBar` (src/components/builder/top-bar.tsx) - Header with Undo/Redo & Share.
         * `SettingsPanel` (src/components/builder/panels/settings-panel.tsx) - Logic for SEO, Domains, and Integrations.
         * `ThemesPanel` (src/components/builder/panels/themes-panel.tsx) - Sidebar panel for selecting themes.
     * **Dashboard:**
         * `SupportDialog` (src/components/dashboard/support-dialog.tsx) - Global help modal.
+        * `CreatePageDialog` (src/components/dashboard/modals/create-page-dialog.tsx) - Global creation modal.
         * `DashboardLayout` (src/app/dashboard/layout.tsx) - Mounts global providers and dialogs.
     * **UI Primitives:** `src/components/ui/*` (Button, Input, Sheet, Sidebar, Dialog, Sonner, etc.)
 * **State Management:**
-    * `useBuilderStore` (src/store/builder-store.ts) - Manages `blocks`, `layout`, `currentTheme`, `pageSettings`, and `isSupportOpen`.
+    * `useBuilderStore` (src/store/builder-store.ts) - Manages `blocks`, `layout`, `currentTheme`, `pageSettings`, `pages`, `history`, and modal states.
 * **Libraries:**
     * `THEMES` (src/lib/themes.ts) - Definitions for visual presets (Clean, Retro Pop, etc.).
 
@@ -47,3 +53,4 @@
 * **Component Identifiers:** All interactive elements must have a `data-id` for testing stability.
 * **Dynamic Styling:** Components rendered in the builder canvas (`LinkBlock`) CANNOT rely solely on Tailwind classes for appearance. They MUST strictly subscribe to `currentTheme` and use inline styles for: `background`, `color`, `border`, `borderRadius`, and `boxShadow`.
 * **Nav Projects & Click Handlers:** The `NavProjects` component (used for Support section) must explicitly handle `onClick` props to prevent default link navigation behavior when triggering actions like opening modals.
+* **Layout History:** `updateLayout` (RGL callback) must coordinate with `pushToHistory` to prevent dragging resizing from being lost on undo.

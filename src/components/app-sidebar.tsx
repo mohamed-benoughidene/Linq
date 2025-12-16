@@ -29,7 +29,7 @@ import { useBuilderStore } from "@/store/builder-store"
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { PageSwitcher } from "@/components/dashboard/page-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -40,7 +40,7 @@ import {
 
 // This is sample data.
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { addBlock, setActivePanel, openSupport } = useBuilderStore()
+  const { addBlock, setActivePanel, openSupport, view, setView } = useBuilderStore()
 
   // This is sample data.
   const data = {
@@ -49,20 +49,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: "m@example.com",
       avatar: "/avatars/shadcn.jpg",
     },
-    teams: [
-      {
-        name: "My Personal Page",
-        logo: Frame,
-        plan: "Free",
-      },
-    ],
     navMain: [
       {
         title: "Blocks",
         url: "#",
-        icon: Layers,
-        isActive: true, // Default open
+        icon: Frame,
+        isActive: view === 'editor',
+        onClick: () => setView('editor'),
         items: [
+
           {
             title: "Link",
             url: "#",
@@ -144,20 +139,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ]
       },
       {
-        title: "Theme",
-        url: "#",
-        icon: Palette,
-      },
-      {
         title: "Analytics",
         url: "#",
         icon: BarChart2,
+        isActive: view === 'analytics',
+        onClick: () => setView('analytics')
+      },
+      {
+        title: "Theme",
+        url: "#",
+        icon: Palette,
+        onClick: () => {
+          setView('editor')
+          setActivePanel("themes")
+        }
       },
       {
         title: "Page Settings",
         url: "#",
         icon: Settings2,
-        onClick: () => setActivePanel('settings')
+        onClick: () => {
+          setView('editor')
+          setActivePanel('settings')
+        }
       },
     ],
     support: [
@@ -172,8 +176,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props} data-id="sidebar-app-container">
-      <SidebarHeader className="border-b border-slate-200">
-        <TeamSwitcher teams={data.teams} />
+      <SidebarHeader>
+        <PageSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain as any} />
