@@ -40,7 +40,7 @@ import {
 
 // This is sample data.
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { addBlock } = useBuilderStore()
+  const { addBlock, setActivePanel, openSupport } = useBuilderStore()
 
   // This is sample data.
   const data = {
@@ -157,18 +157,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Page Settings",
         url: "#",
         icon: Settings2,
+        onClick: () => setActivePanel('settings')
       },
     ],
     support: [
       {
-        name: "Help Center",
-        url: "#",
-        icon: LifeBuoy,
-      },
-      {
-        name: "Send Feedback",
+        name: "Support & Feedback",
         url: "#",
         icon: Send,
+        onClick: () => openSupport()
       },
     ],
   }

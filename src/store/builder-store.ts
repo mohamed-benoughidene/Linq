@@ -3,6 +3,24 @@ import { v4 as uuidv4 } from 'uuid'
 import { Layout } from 'react-grid-layout'
 import { ThemePreset, THEMES } from '@/lib/themes'
 
+// ... imports
+export interface PageSettings {
+    // Identity
+    slug: string
+    customDomain?: string
+    favicon?: string
+
+    // SEO & Social
+    seoTitle: string
+    seoDescription: string
+    socialImage?: string
+
+    // Integrations & Compliance
+    googleAnalyticsId?: string
+    metaPixelId?: string
+    cookieBanner: boolean
+}
+
 export interface BuilderBlock {
     id: string
     type: 'link' | 'header' | 'video' | 'audio' | 'image' | 'newsletter' | 'gallery' | 'timer' | 'text' | 'map' | 'socials' | 'contact' | 'calendly' | 'embed'
@@ -62,11 +80,33 @@ interface BuilderState {
     currentTheme: ThemePreset
     setTheme: (themeId: string) => void
     updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => void
+    pageSettings: PageSettings
+    updatePageSettings: (settings: Partial<PageSettings>) => void
+
+    // Support Modal
+    isSupportOpen: boolean
+    openSupport: () => void
+    closeSupport: () => void
 }
 
 export const useBuilderStore = create<BuilderState>((set) => ({
     blocks: [],
     currentTheme: THEMES[0],
+    pageSettings: {
+        slug: 'my-page',
+        seoTitle: 'My Personal Page',
+        seoDescription: 'Check out my links and bio.',
+        cookieBanner: true,
+    },
+
+    updatePageSettings: (settings) => {
+        set((state) => ({
+            pageSettings: {
+                ...state.pageSettings,
+                ...settings
+            }
+        }))
+    },
 
     setTheme: (themeId: string) => {
         const theme = THEMES.find((t) => t.id === themeId)
@@ -236,5 +276,9 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     setActivePanel: (panel) => set({ activePanel: panel }),
     togglePanel: (panel) => set((state) => ({
         activePanel: state.activePanel === panel ? 'none' : panel
-    }))
+    })),
+
+    isSupportOpen: false,
+    openSupport: () => set({ isSupportOpen: true }),
+    closeSupport: () => set({ isSupportOpen: false }),
 }))

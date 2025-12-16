@@ -74,6 +74,8 @@ export function NavMain({
                   tooltip={item.title}
                   data-id={`sidebar-nav-main-item-${item.title}`}
                   isActive={isActive}
+                  onClick={() => togglePanel('settings')}
+                  className={isActive ? "text-violet-600 bg-violet-50 hover:bg-violet-100 hover:text-violet-700" : ""}
                 >
                   {item.icon && <item.icon className={isActive ? "text-violet-600" : "text-slate-600"} />}
                   <span className={isActive ? "font-medium" : ""}>{item.title}</span>

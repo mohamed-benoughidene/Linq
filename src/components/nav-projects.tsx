@@ -19,17 +19,28 @@ export function NavProjects({
     name: string
     url: string
     icon: LucideIcon
+    onClick?: () => void
   }[]
 }) {
 
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="tracking-tight">Support</SidebarGroupLabel>
+      <SidebarGroupLabel className="tracking-tight">Support & Feedback</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild tooltip={item.name} data-id={`sidebar-nav-projects-item-${item.name}`}>
+            <SidebarMenuButton
+              asChild
+              tooltip={item.name}
+              data-id={`sidebar-nav-projects-item-${item.name}`}
+              onClick={(e) => {
+                if (item.onClick) {
+                  e.preventDefault()
+                  item.onClick()
+                }
+              }}
+            >
               <a href={item.url}>
                 <item.icon className="text-slate-600" />
                 <span>{item.name}</span>
