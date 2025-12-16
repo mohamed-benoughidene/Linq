@@ -5,8 +5,8 @@
 
 ## 1. Project Status
 * **Phase:** Phase 1: Builder & Customization
-* **Current Focus:** Implementing Theme Engine and Dynamic Styling.
-* **Last Update:** 2025-12-14 22:30
+* **Current Focus:** Finalizing Block Architecture and Theme Integrations (Calendly, Embed, Gradient blocks).
+* **Last Update:** 2025-12-16 11:30
 
 ## 2. Technical Decisions (The "Why")
 - [2025-12-12] **Framework:** Next.js 16.0.10 (App Router) + React 19.2.1 for latest features and performance.
@@ -16,6 +16,8 @@
 - [2025-12-12] **Security:** Upstash Redis for rate limiting critical endpoints.
 - [2025-12-13] **Architecture & UI:** Switched to **Component-Based Architecture** using Shadcn UI. Organized by layer (`src/components/`, `src/hooks/`) rather than feature folders to align with standard Next.js patterns.
 - [2025-12-14] **Theme Engine:** Implemented `ThemePreset` system. We use a global `currentTheme` object in the store to drive dynamic inline styles for user-generated content (Canvas/Blocks) while keeping the editor UI (Sidebar/Panels) in standard Tailwind.
+- [2025-12-15] **Integrations:** Added `Calendly` and generic `Embed` blocks for external content support.
+- [2025-12-16] **Theme Schema:** Extended `ThemePreset` to support `blockBackgroundType` for gradient support in individual blocks.
 
 ## 3. Architecture Map
 * **Database:** Supabase (Pending setup).
@@ -26,7 +28,8 @@
     * **Sidebar:** `AppSidebar` (src/components/app-sidebar.tsx) - Main navigation using Shadcn Sidebar.
     * **Builder:**
         * `BuilderCanvas` (src/components/builder/builder-canvas.tsx) - The main drag-and-drop area.
-        * `LinkBlock` (src/components/builder/link-block.tsx) - The individual link components.
+        * `BlockRenderer` (src/components/builder/block-renderer.tsx) - Orchestrates rendering of all block types.
+        * `Blocks directory` (src/components/builder/blocks/*) - Contains individual block implementations (Calendly, Embed, Video, etc.).
         * `ThemesPanel` (src/components/builder/panels/themes-panel.tsx) - Sidebar panel for selecting themes.
     * **UI Primitives:** `src/components/ui/*` (Button, Input, Sheet, Sidebar, etc.)
 * **State Management:**
@@ -39,4 +42,5 @@
     - `.agent/debug.md` (Error Resolution)
     - `.agent/test.md` (QA & Testing)
     - `.agent/context_manager.md` (Context Updates)
+* **Theme Synchronization:** The `ThemePreset` interface in `src/lib/themes.ts` MUST act as the single source of truth for theme properties. If you add a control to `ThemesPanel`, you must update the interface immediately to prevent type errors.
 * **Dynamic Styling:** Components rendered in the builder canvas (`LinkBlock`) CANNOT rely solely on Tailwind classes for appearance. They MUST strictly subscribe to `currentTheme` and use inline styles for: `background`, `color`, `border`, `borderRadius`, and `boxShadow`.

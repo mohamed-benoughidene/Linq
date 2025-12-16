@@ -18,7 +18,7 @@ export function ThemeCard({ theme, isActive, onClick }: ThemeCardProps) {
                 isActive && "ring-2 ring-blue-500 ring-offset-2"
             )}
             style={{
-                backgroundColor: theme.colors.background, // Use page background for context
+                background: theme.colors.background, // Use page background for context
                 borderRadius: theme.styles.borderRadius,
             }}
         >
@@ -60,7 +60,7 @@ export function ThemeCard({ theme, isActive, onClick }: ThemeCardProps) {
                     />
                     <div
                         className="h-3 w-3 rounded-full border border-white/20 shadow-sm"
-                        style={{ backgroundColor: theme.colors.background }}
+                        style={{ background: theme.colors.background }}
                     />
                     <div
                         className="h-3 w-3 rounded-full border border-white/20 shadow-sm"

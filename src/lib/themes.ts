@@ -1,4 +1,3 @@
-
 export interface ThemePreset {
   id: string;
   name: string;
@@ -15,6 +14,19 @@ export interface ThemePreset {
     borderRadius: string; // e.g., '12px', '0px'
     borderWidth: string;  // e.g., '0px', '2px'
     shadow: string;       // CSS box-shadow string (e.g. '4px 4px 0px #000')
+    backgroundType: 'solid' | 'gradient' | 'image';
+    backgroundImage?: string;
+    backgroundBlur?: number;
+    fontPairing?: string;
+    buttonStyle?: 'solid' | 'outline';
+    blockBackgroundColor?: string;
+    blockAlign?: 'left' | 'center' | 'right';
+    blockTransparency?: number;
+    blockTextColor?: string;
+    blockButtonBg?: string;
+    blockButtonText?: string;
+    blockLabelColor?: string;
+    blockBackgroundType?: 'solid' | 'gradient';
   };
 }
 
@@ -32,9 +44,14 @@ export const THEMES: ThemePreset[] = [
     },
     styles: {
       fontFamily: 'Inter, sans-serif',
-      borderRadius: '0.75rem', // rounded-xl
+      borderRadius: '12px', // rounded-xl
       borderWidth: '1px',
       shadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', // shadow-sm
+      backgroundType: 'solid',
+      buttonStyle: 'solid',
+      blockBackgroundColor: '#ffffff',
+      blockAlign: 'left',
+      blockTransparency: 0,
     },
   },
   {
@@ -53,6 +70,11 @@ export const THEMES: ThemePreset[] = [
       borderRadius: '0px',
       borderWidth: '2px',
       shadow: '4px 4px 0px 0px #000000',
+      backgroundType: 'solid',
+      buttonStyle: 'solid',
+      blockBackgroundColor: '#ffffff',
+      blockAlign: 'left',
+      blockTransparency: 0,
     },
   },
 ];

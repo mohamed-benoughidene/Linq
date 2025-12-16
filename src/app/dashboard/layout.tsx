@@ -17,7 +17,7 @@ export default function DashboardLayout({
     // Determine panel width
     // If activePanel is 'none', width is 0.
     // Otherwise it's 218px (approx 15% less than 16rem/256px sidebar).
-    const panelWidth = activePanel === 'none' ? '0px' : '218px'
+    const panelWidth = activePanel === 'none' ? '0px' : '16rem'
 
     return (
         <SidebarProvider defaultOpen={true}>
