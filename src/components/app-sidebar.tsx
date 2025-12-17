@@ -3,191 +3,127 @@
 import * as React from "react"
 import {
   BarChart2,
-  Frame,
-  Layers,
-  LifeBuoy,
   Palette,
-  Send,
   Settings2,
   Plus,
-  Link2,
-  User as UserCircle, // Changed to User for consistency or import UserCircle if available. Lucide has User.
-  Video,
-  Music,
-  Image as ImageIcon,
-  Clock, // Timer icon
-  Mail,   // Newsletter icon
-  Type,   // Text icon
-  MapPin, // Map icon
-  Share2, // Socials icon
-  MessageSquare, // Contact icon
-  CalendarClock, // Calendly icon
-  Globe // Embed icon
+  Share2
 } from "lucide-react"
 
+import { SharePopover } from "@/components/builder/share-popover"
+
 import { useBuilderStore } from "@/store/builder-store"
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
 import { PageSwitcher } from "@/components/dashboard/page-switcher"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
 } from "@/components/ui/sidebar"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
-// This is sample data.
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { addBlock, setActivePanel, openSupport, view, setView } = useBuilderStore()
+  const { setActivePanel, activePanel, setView, view } = useBuilderStore()
 
-  // This is sample data.
-  const data = {
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
+  // Define nav items
+  const navItems = [
+    {
+      label: "Blocks",
+      icon: Plus,
+      isActive: activePanel === 'blocks',
+      onClick: () => {
+        setView('editor')
+        setActivePanel(activePanel === 'blocks' ? null : 'blocks')
+      },
+      id: "sidebar-nav-blocks"
     },
-    navMain: [
-      {
-        title: "Blocks",
-        url: "#",
-        icon: Frame,
-        isActive: view === 'editor',
-        onClick: () => setView('editor'),
-        items: [
-
-          {
-            title: "Link",
-            url: "#",
-            icon: Link2, // We need to import Link2
-            onClick: () => addBlock('link')
-          },
-          {
-            title: "Header / Bio",
-            url: "#",
-            icon: UserCircle, // We need to import UserCircle
-            onClick: () => addBlock('header')
-          },
-          {
-            title: "Video",
-            url: "#",
-            icon: Video, // We need to import Video
-            onClick: () => addBlock('video')
-          },
-          {
-            title: "Audio",
-            url: "#",
-            icon: Music, // We need to import Music
-            onClick: () => addBlock('audio')
-          },
-          {
-            title: "Gallery",
-            url: "#",
-            icon: ImageIcon,
-            onClick: () => addBlock('gallery')
-          },
-          {
-            title: "Newsletter",
-            url: "#",
-            icon: Mail,
-            onClick: () => addBlock('newsletter')
-          },
-          {
-            title: "Timer",
-            url: "#",
-            icon: Clock,
-            onClick: () => addBlock('timer')
-          },
-          {
-            title: "Text",
-            url: "#",
-            icon: Type,
-            onClick: () => addBlock('text')
-          },
-          {
-            title: "Map",
-            url: "#",
-            icon: MapPin,
-            onClick: () => addBlock('map')
-          },
-          {
-            title: "Socials",
-            url: "#",
-            icon: Share2,
-            onClick: () => addBlock('socials')
-          },
-          {
-            title: "Contact Form",
-            url: "#",
-            icon: MessageSquare,
-            onClick: () => addBlock('contact')
-          },
-          {
-            title: "Calendly",
-            url: "#",
-            icon: CalendarClock,
-            onClick: () => addBlock('calendly')
-          },
-          {
-            title: "Embed / Iframe",
-            url: "#",
-            icon: Globe,
-            onClick: () => addBlock('embed')
-          }
-        ]
+    {
+      label: "Design",
+      icon: Palette,
+      isActive: activePanel === 'themes',
+      onClick: () => {
+        setView('editor')
+        setActivePanel(activePanel === 'themes' ? null : 'themes')
       },
-      {
-        title: "Analytics",
-        url: "#",
-        icon: BarChart2,
-        isActive: view === 'analytics',
-        onClick: () => setView('analytics')
+      id: "sidebar-nav-design"
+    },
+    {
+      label: "Analytics",
+      icon: BarChart2,
+      isActive: view === 'analytics',
+      onClick: () => {
+        setView('analytics')
+        setActivePanel(null)
       },
-      {
-        title: "Theme",
-        url: "#",
-        icon: Palette,
-        onClick: () => {
-          setView('editor')
-          setActivePanel("themes")
-        }
+      id: "sidebar-nav-analytics"
+    },
+    {
+      label: "Settings",
+      icon: Settings2,
+      isActive: activePanel === 'settings',
+      onClick: () => {
+        setView('editor')
+        setActivePanel(activePanel === 'settings' ? null : 'settings')
       },
-      {
-        title: "Page Settings",
-        url: "#",
-        icon: Settings2,
-        onClick: () => {
-          setView('editor')
-          setActivePanel('settings')
-        }
-      },
-    ],
-    support: [
-      {
-        name: "Support & Feedback",
-        url: "#",
-        icon: Send,
-        onClick: () => openSupport()
-      },
-    ],
-  }
+      id: "sidebar-nav-settings"
+    }
+  ]
 
   return (
-    <Sidebar collapsible="icon" {...props} data-id="sidebar-app-container">
-      <SidebarHeader>
+    <Sidebar collapsible="none" className="!w-[64px] border-r border-slate-200 bg-white" {...props} data-id="sidebar-app-container">
+      <SidebarHeader className="flex items-center justify-center border-b border-slate-100 py-2">
         <PageSwitcher />
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain as any} />
-        {/* Type cast needed because LucideIcon type mismatch sometimes or optional properties */}
-        <NavProjects projects={data.support} />
+
+      <SidebarContent className="flex flex-col items-center gap-4 py-4">
+        {navItems.map((item) => (
+          <Tooltip key={item.label}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={item.onClick}
+                data-id={item.id}
+                className={cn(
+                  "h-10 w-10 flex items-center justify-center rounded-xl transition-all duration-200",
+                  item.isActive
+                    ? "bg-slate-900 text-white shadow-md scale-105"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-medium">
+              {item.label}
+            </TooltipContent>
+          </Tooltip>
+        ))}
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
+
+      <SidebarFooter className="py-4 flex flex-col items-center gap-4">
+        <SharePopover
+          trigger={
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  data-id="sidebar-share-btn"
+                  className="h-10 w-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200"
+                >
+                  <Share2 className="h-5 w-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="font-medium">
+                Share
+              </TooltipContent>
+            </Tooltip>
+          }
+        />
+        <NavUser user={{
+          name: "John Doe",
+          email: "john@example.com",
+          avatar: "https://github.com/shadcn.png"
+        }} />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   )
 }

@@ -24,11 +24,12 @@ import {
 
 import "react-grid-layout/css/styles.css"
 import "react-resizable/css/styles.css"
+import { cn } from "@/lib/utils"
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 export function BuilderCanvas() {
-    const { blocks, addBlock, updateLayout, currentTheme } = useBuilderStore()
+    const { blocks, addBlock, updateLayout, currentTheme, isPreview } = useBuilderStore()
 
     const debouncedUpdateLayout = useMemo(
         () => debounce((currentLayout: Layout[]) => {
@@ -85,7 +86,12 @@ export function BuilderCanvas() {
 
     return (
         <div
-            className="h-full w-full p-4 transition-colors duration-300 ease-in-out flex flex-col"
+            className={cn(
+                "transition-all duration-300 ease-in-out flex flex-col",
+                isPreview
+                    ? "w-full max-w-[400px] h-[800px] shadow-2xl rounded-[3rem] border-[8px] border-slate-900 bg-white overflow-y-auto scrollbar-hide shrink-0 relative"
+                    : "h-full w-full p-4 min-w-[1000px] mx-auto"
+            )}
             data-id="builder-canvas-list"
             style={{
                 background: currentTheme.colors.background,
@@ -101,6 +107,17 @@ export function BuilderCanvas() {
             } as React.CSSProperties}
         >
             <style>{gridStyles}</style>
+
+            {isPreview && (
+                <>
+
+
+
+
+                    {/* Home Indicator */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[5px] bg-slate-900/20 rounded-full z-50 pointer-events-none" />
+                </>
+            )}
 
             {blocks.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center space-y-4 rounded-lg border border-dashed border-slate-200/50 bg-white/50 p-8 text-center animate-in fade-in-50 backdrop-blur-sm" data-id="builder-canvas-empty">

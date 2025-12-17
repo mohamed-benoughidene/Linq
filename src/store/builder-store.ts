@@ -113,6 +113,7 @@ export interface BuilderState {
 
     currentTheme: ThemePreset
     setTheme: (theme: ThemePreset) => void
+    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => void
 
     pageSettings: PageSettings
     updatePageSettings: (settings: Partial<PageSettings>) => void
@@ -133,6 +134,10 @@ export interface BuilderState {
     view: 'editor' | 'analytics'
     setView: (view: 'editor' | 'analytics') => void
     stats: AnalyticsStats
+
+    // Preview Mode
+    isPreview: boolean
+    togglePreview: () => void
 
     // History (Undo/Redo)
     history: HistoryState
@@ -433,6 +438,9 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
 
     view: 'editor',
     setView: (view) => set({ view }),
+
+    isPreview: false,
+    togglePreview: () => set((state) => ({ isPreview: !state.isPreview })),
 
     stats: {
         totalViews: 12450,

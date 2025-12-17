@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { useBuilderStore } from "@/store/builder-store"
 import { ThemesPanel } from "@/components/builder/panels/themes-panel"
 import { SettingsPanel } from "@/components/builder/panels/settings-panel"
+import { BlocksPanel } from "@/components/builder/panels/blocks-panel"
 import { SidebarSync } from "@/components/dashboard/sidebar-sync"
 import { SupportDialog } from "@/components/dashboard/support-dialog"
 import { CreatePageDialog } from "@/components/dashboard/modals/create-page-dialog"
@@ -19,8 +20,11 @@ export default function DashboardLayout({
 
     // Determine panel width
     // If activePanel is 'none', width is 0.
-    // Otherwise it's 218px (approx 15% less than 16rem/256px sidebar).
-    const panelWidth = activePanel === null ? '0px' : activePanel === 'settings' ? '20rem' : '16rem'
+    // settings: 20rem (320px), blocks: 240px, themes: 16rem (256px)
+    // settings: 20rem (320px), blocks: 16rem (256px), themes: 16rem (256px)
+    const panelWidth = activePanel === 'settings' ? '20rem'
+        : activePanel === 'blocks' || activePanel === 'themes' ? '16rem'
+            : '0px'
 
     return (
         <SidebarProvider defaultOpen={true}>
@@ -40,9 +44,11 @@ export default function DashboardLayout({
                         // Using style for width to allow 0px
                     )}
                     style={{ width: panelWidth }}
+                    data-id="flyout-panel"
                 >
                     {activePanel === 'themes' && <ThemesPanel />}
                     {activePanel === 'settings' && <SettingsPanel />}
+                    <BlocksPanel />
                 </div>
 
                 {/* Column 3: Canvas Stage (Main Content) */}

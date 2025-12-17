@@ -1,56 +1,62 @@
-# Project Context
-
-**Role:** Technical Documentation Lead.
-**Objective:** Maintain `Context.md` as the absolute source of truth for the project state, architecture, and "gotchas."
+# Context.md
 
 ## 1. Project Status
-* **Phase:** Phase 3: Multi-Page & Core UX
-* **Current Focus:** Handling complex user flows (Multi-page switching, Undo/Redo, Sharing).
-* **Last Update:** 2025-12-16 16:10
+* **Phase:** Phase 3: Beta Polish (Mock Mode)
+* **Current Focus:** Resolving layout bugs and polishing UI interactions.
+* **Last Update:** 2025-12-18 00:15
 
-## 2. Technical Decisions (The "Why")
-- [2025-12-12] **Framework:** Next.js 16.0.10 (App Router) + React 19.2.1 for latest features and performance.
-- [2025-12-12] **Styling:** Tailwind CSS v4 for developer UI flexibility, paired with inline styles for user customizations (Hybrid Styling).
-- [2025-12-12] **Auth & DB:** Supabase (Postgres + Auth + RLS) for backend-as-a-service.
-- [2025-12-12] **Testing:** Vitest + React Testing Library + JSDOM for unit and component testing.
-- [2025-12-12] **Security:** Upstash Redis for rate limiting critical endpoints.
-- [2025-12-13] **Architecture & UI:** Switched to **Component-Based Architecture** using Shadcn UI. Organized by layer (`src/components/`, `src/hooks/`) rather than feature folders to align with standard Next.js patterns.
-- [2025-12-14] **Theme Engine:** Implemented `ThemePreset` system. We use a global `currentTheme` object in the store to drive dynamic inline styles for user-generated content (Canvas/Blocks) while keeping the editor UI (Sidebar/Panels) in standard Tailwind.
-- [2025-12-15] **Integrations:** Added `Calendly` and generic `Embed` blocks for external content support.
-- [2025-12-16] **Theme Schema:** Extended `ThemePreset` to support `blockBackgroundType` for gradient support in individual blocks.
-- [2025-12-16] **Page Settings:** Implemented comprehensive settings panel for SEO, Social Previews, and Domain configuration.
-- [2025-12-16] **DNS Workflow:** Standardized Custom Domain DNS setup to require both **A Record** (root) and **CNAME** (www) for full coverage.
-- [2025-12-16] **Support System:** Implemented a global `SupportDialog` driven by `zustand` state to provide immediate feedback/help access via the `AppSidebar`.
-- [2025-12-16] **Multi-Page State:** `activePageId` drives the UI. When switching, valid state is snapshot to `pages` array.
-- [2025-12-16] **Undo/Redo:** Implemented manual History Stack (`past`, `future`) in Zustand to avoid library overhead for simple block arrays.
-- [2025-12-16] **Global Modals:** `CreatePageDialog` is lifted to `DashboardLayout` and controlled via `useBuilderStore` to allow triggering from Sidebar or other constrained contexts.
+## 2. Technical Decisions
+- [2025-12-16] **Zustand Store**: Centralized builder state (blocks, pages, themes) in `builder-store.ts`.
+- [2025-12-16] **Mock Phase**: `CURRENT_PHASE = "MOCK"` disables real DB interactions for rapid UI dev.
+- [2025-12-17] **Components**: Using standard Shadcn UI components.
+- [2025-12-17] **Styling**: Tailwind v4 with CSS variables for theming.
+- [2025-12-18] **Navigation Rail**: Refactored Sidebar to collapsed rail + flyout panels for blocks/themes.
+- [2025-12-18] **Mobile Preview**: Implemented as a responsive overlay (85vh) with conditional styling logic.
+- [2025-12-18] **Split Button**: Created reusable `SplitButton` component for primary/secondary actions.
 
-## 3. Architecture Map
-* **Database:** Supabase (Pending setup).
-* **Routes:**
-    * `/` (Home/Landing) - `src/app/page.tsx`
-    * `/dashboard` - `src/app/dashboard/page.tsx`
-* **Key Components:**
-    * **Sidebar:** `AppSidebar` (src/components/app-sidebar.tsx) - Main navigation using Shadcn Sidebar.
-    * **Navigation:** `PageSwitcher` (src/components/dashboard/page-switcher.tsx) - Replaces TeamSwitcher for page navigation.
-    * **Builder:**
-        * `BuilderCanvas` (src/components/builder/builder-canvas.tsx) - The main drag-and-drop area.
-        * `TopBar` (src/components/builder/top-bar.tsx) - Header with Undo/Redo & Share.
-        * `SettingsPanel` (src/components/builder/panels/settings-panel.tsx) - Logic for SEO, Domains, and Integrations.
-        * `ThemesPanel` (src/components/builder/panels/themes-panel.tsx) - Sidebar panel for selecting themes.
-    * **Dashboard:**
-        * `SupportDialog` (src/components/dashboard/support-dialog.tsx) - Global help modal.
-        * `CreatePageDialog` (src/components/dashboard/modals/create-page-dialog.tsx) - Global creation modal.
-        * `DashboardLayout` (src/app/dashboard/layout.tsx) - Mounts global providers and dialogs.
-    * **UI Primitives:** `src/components/ui/*` (Button, Input, Sheet, Sidebar, Dialog, Sonner, etc.)
-* **State Management:**
-    * `useBuilderStore` (src/store/builder-store.ts) - Manages `blocks`, `layout`, `currentTheme`, `pageSettings`, `pages`, `history`, and modal states.
-* **Libraries:**
-    * `THEMES` (src/lib/themes.ts) - Definitions for visual presets (Clean, Retro Pop, etc.).
+## 3. App Primitives
+### Block Types
+These are the currently implemented block types found in `block-renderer.tsx`.
+- `link`
+- `header` (Profile Header)
+- `video` (YouTube/Vimeo)
+- `audio` (Spotify)
+- `gallery` (Carousel, Accordion, Cards, Stack)
+- `timer` (Countdown)
+- `newsletter` (Email capture)
+- `text` (Title + Body)
+- `map` (Address)
+- `socials` (Icon list)
+- `contact` (Form)
+- `calendly` (Booking)
+- `embed` (Iframe)
 
-## 4. "Gotchas" & Known Issues (Critical)
-* **Live Input Focus:** When building interactive panels (like `SettingsPanel`), NEVER define helper components (like `AccordionItem`) *inside* the main component body. This causes re-mounting on every state change (keystroke) and kills input focus. Always define them outside or in separate files.
-* **Component Identifiers:** All interactive elements must have a `data-id` for testing stability.
-* **Dynamic Styling:** Components rendered in the builder canvas (`LinkBlock`) CANNOT rely solely on Tailwind classes for appearance. They MUST strictly subscribe to `currentTheme` and use inline styles for: `background`, `color`, `border`, `borderRadius`, and `boxShadow`.
-* **Nav Projects & Click Handlers:** The `NavProjects` component (used for Support section) must explicitly handle `onClick` props to prevent default link navigation behavior when triggering actions like opening modals.
-* **Layout History:** `updateLayout` (RGL callback) must coordinate with `pushToHistory` to prevent dragging resizing from being lost on undo.
+### Page States
+- `draft` (implicitly supported via state)
+- `published` (implicitly supported via state)
+
+## 4. Architecture Map
+### Store Shape (`BuilderState`)
+- `pages`: Array of `Page` objects.
+- `activePageId`: String.
+- `blocks`: Array of `BuilderBlock` (current page blocks).
+- `currentTheme`: `ThemePreset`.
+- `pageSettings`: `PageSettings` (SEO, Integrations).
+- `activePanel`: `'blocks' | 'settings' | 'themes' | null`.
+- `view`: `'editor' | 'analytics'`.
+- `history`: Undo/Redo stack.
+- `isPreview`: Boolean (Mobile Preview toggle).
+
+### Key Components
+- `src/store/builder-store.ts`: The Brain.
+- `src/components/builder/builder-canvas.tsx`: Drag-and-drop grid area.
+- `src/components/builder/block-renderer.tsx`: Switch statement rendering specific blocks.
+- `src/components/app-sidebar.tsx`: Navigation Rail + Share Action.
+- `src/app/dashboard/layout.tsx`: Layout wrapper managing Flyout Panels (Settings, Themes, Blocks).
+- `src/components/builder/top-bar.tsx`: Floating canvas control (Undo/Redo, Mobile Preview, Publish).
+- `src/components/ui/split-button.tsx`: Reusable Split Button component.
+
+## 5. Known Issues / "Gotchas"
+- **Drag & Drop**: Currently only supports reordering blocks on canvas. Dragging from sidebar to canvas is NOT implemented.
+- **Video Block**: Only valid YouTube/Vimeo URLs are parsed; raw rendering may fail if invalid.
+- **Mock Data**: Analytics are hardcoded in `builder-store.ts`.

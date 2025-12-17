@@ -104,7 +104,7 @@ export function SettingsPanel() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-slate-400 hover:text-slate-600 rounded-md"
-                    onClick={() => setActivePanel('none')}
+                    onClick={() => setActivePanel(null)}
                 >
                     <X className="h-4 w-4" />
                 </Button>

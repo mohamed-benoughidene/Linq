@@ -5,52 +5,55 @@ description: The Librarian's protocol. Governs the maintenance of Context.md as 
 # Context Management Protocol
 
 **Role:** Technical Documentation Lead.
-**Objective:** Maintain `Context.md` as the absolute source of truth for the project state, architecture, and "gotchas."
-**save the file in:** `Context.md`
+**Objective:** Maintain `Context.md` as the absolute source of truth for the project state, architecture, and available features.
+**Save File:** `Context.md`
 
-## 1. The `Context.md` Philosophy
-This file is the "Brain" of the project. If it's not in `Context.md`, it didn't happen.
-Every time a significant change occurs (new feature, schema change, bug fix), you must update this file.
+## 1. The Philosophy
+If it is not in `Context.md`, it does not exist.
+This file prevents "AI Hallucinations" by explicitly listing what is *currently* implemented, not what is *theoretically* standard.
 
 ## 2. Structure of `Context.md` (Strict Schema)
-You must enforce this exact structure when creating or updating the file:
 
 ### A. Project Status
-* **Phase:** (e.g., "Phase 1: Mock Dashboard")
-* **Current Focus:** (e.g., "Building the draggable link editor")
+* **Phase:** (e.g., "Phase 3: Beta Polish")
+* **Current Focus:** (e.g., "Refactoring Blocks Panel")
 * **Last Update:** (YYYY-MM-DD HH:MM)
 
 ### B. Technical Decisions (The "Why")
 * *Format:* `- [Date] Decision: Reason.`
-* *Example:* `- [2024-01-20] Hybrid Styling: We use Inline Styles for user prefs and Tailwind for UI to allow safe user customization.`
+* *Example:* `- [2024-01-20] Zustand History: Used manual stack instead of `zundo` to have granular control over undo actions.`
 
-### C. Architecture Map
-* **Database:** List current tables and RLS policies (briefly).
-* **Routes:** List active routes (e.g., `/dashboard`, `/[username]`).
-* **Key Components:** List complex components with their `data-id` prefixes.
+### C. App Primitives (The "What")
+* **Crucial:** You must scan code to list exact available options. Do not guess.
+* **Block Types:** List all supported `type` strings found in your block renderer or store (e.g., `['link', 'header', 'video', 'newsletter']`).
+* **Theme Presets:** List available themes defined in `src/lib/themes.ts`.
+* **Page States:** List valid page statuses (e.g., `['draft', 'published']`).
 
-### D. "Gotchas" & Known Issues (Critical)
-* List specific bugs or weird behaviors we found.
-* *Example:* "The `dnd-kit` library requires a strictly typed `id` string, passing a number causes a crash."
+### D. Architecture Map
+* **Database:** Current tables/Policies.
+* **Store Shape:** simplified interface of the Zustand store (e.g., `blocks: Block[], pageSettings: Settings`).
+* **Key Components:** List complex components with their paths.
+
+### E. "Gotchas" & Known Issues
+* *Example:* "The `VideoBlock` only supports YouTube URLs right now, not Vimeo."
 
 ## 3. Operations
 
 ### Operation: /init-context
-**Trigger:** User says "Create the context file" or runs `/init-context`.
+**Trigger:** User says "Create context" or `/init-context`.
 **Action:**
-1.  Scan the current file structure (`src/`, `components/`, etc.).
-2.  Read `dev.md` to understand the stack.
-3.  Generate a fresh `Context.md` filling in the sections above based on what you see.
+1. **Scan Primitives:** Look at `src/types`, `src/store`, and `src/components/builder/block-renderer.tsx`. Extract the exact list of `case` statements or union types for blocks.
+2. **Scan Architecture:** Map the file structure.
+3. **Generate:** Write the full `Context.md` using the schema above.
 
 ### Operation: /update-context
-**Trigger:** User says "Update context with [X]" or after completing a major task.
+**Trigger:** User says "Update context with [X]" or pushes code.
 **Action:**
-1.  **Read** the current `Context.md`.
-2.  **Append** the new feature/decision under the relevant section.
-3.  **Prune** outdated info (e.g., if we moved from Mock to Supabase, remove "Mocking" status).
-4.  **Log** the change in the "Recent Changes" log.
+1. **Verify:** Check if the new feature introduced new Primitives (e.g., Did we add a "Map" block?).
+2. **Append:** Add the decision to Section B.
+3. **Update Primitives:** Update Section C if lists changed.
+4. **Prune:** Remove completed tasks from "Current Focus".
 
 ## 4. Maintenance Rules
-* **Be Concise:** No fluff. Bullet points only.
-* **Auto-Tagging:** When mentioning a component, always include its location (e.g., `Sidebar (src/components/ui/sidebar.tsx)`).
-* **Schema Sync:** If the Supabase schema changes, update the "Database" section immediately.
+* **No Assumptions:** If you don't see a "Twitter Block" in the code, do explicitly NOT list it.
+* **Path Precision:** Always include the file path when referencing a component.

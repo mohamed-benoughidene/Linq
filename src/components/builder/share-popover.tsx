@@ -12,7 +12,11 @@ import { Check, Copy, QrCode, Share2 } from "lucide-react"
 import { useState } from "react"
 import { useBuilderStore } from "@/store/builder-store"
 
-export function SharePopover() {
+interface SharePopoverProps {
+    trigger?: React.ReactNode
+}
+
+export function SharePopover({ trigger }: SharePopoverProps) {
     const { pageSettings } = useBuilderStore()
     const [copied, setCopied] = useState(false)
 
@@ -28,10 +32,12 @@ export function SharePopover() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button size="sm" className="gap-2 rounded-full px-4" data-id="builder-share-btn">
-                    <Share2 className="h-3.5 w-3.5" />
-                    Share
-                </Button>
+                {trigger || (
+                    <Button size="sm" className="gap-2 rounded-full px-4" data-id="builder-share-btn">
+                        <Share2 className="h-3.5 w-3.5" />
+                        Share
+                    </Button>
+                )}
             </PopoverTrigger>
             <PopoverContent className="w-80" align="end">
                 <div className="grid gap-4">
