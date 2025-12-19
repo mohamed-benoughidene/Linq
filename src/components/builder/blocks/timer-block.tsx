@@ -13,6 +13,7 @@ interface TimerBlockProps {
         timerLabel?: string
         variant?: BuilderBlock['content']['variant']
         isActive: boolean
+        highlight?: boolean
     }
 }
 
@@ -60,8 +61,14 @@ export function TimerBlock({ id, data }: TimerBlockProps) {
     if (!targetDate) {
         return (
             <div
-                className="w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 p-4 gap-2"
-                style={{ borderRadius: currentTheme.styles.borderRadius }}
+                className="w-full h-full flex flex-col items-center justify-center text-sm font-medium border-2 border-dashed p-4 gap-2"
+                style={{
+                    borderRadius: currentTheme.styles.borderRadius,
+                    borderColor: currentTheme.colors.border,
+                    background: 'var(--theme-block-bg)',
+                    color: 'var(--theme-block-text)',
+                    opacity: 0.5
+                }}
             >
                 <Clock className="h-6 w-6 opacity-50" />
                 <span>Set Date</span>
@@ -84,7 +91,10 @@ export function TimerBlock({ id, data }: TimerBlockProps) {
 
     return (
         <div
-            className="w-full h-full p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-sm border"
+            className={cn(
+                "w-full h-full p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-sm border outline-none",
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 background: 'var(--theme-block-bg)',
                 borderRadius: 'var(--theme-radius)',
@@ -92,6 +102,14 @@ export function TimerBlock({ id, data }: TimerBlockProps) {
                 color: 'var(--theme-block-text)' // Ensure numbers use text color
             }}
         >
+            {/* Visual Drag Handle (Optional for Timer? It's usually draggable by surface. Let's add it for consistency if space allows, but Timer is often small. LinkBlock doesn't have visible handle. Let's skip valid handle for Timer for now to avoid clutter, or add it? Plan said "blocks with internal interactions". Timer is static. Skip handle.) */}
+
+            {/* Hidden Badge */}
+            {!data.isActive && (
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
+                </div>
+            )}
             {timerLabel && (
                 <div
                     className="text-sm font-medium mb-2 uppercase tracking-wide"

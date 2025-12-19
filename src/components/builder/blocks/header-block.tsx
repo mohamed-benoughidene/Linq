@@ -11,6 +11,7 @@ interface HeaderBlockProps {
         description?: string // Bio
         thumbnail?: string // Profile Pic
         isActive: boolean
+        highlight?: boolean
     }
 }
 
@@ -19,7 +20,10 @@ export function HeaderBlock({ id, data }: HeaderBlockProps) {
 
     return (
         <div
-            className="w-full h-full flex flex-col items-center justify-center text-center p-4"
+            className={cn(
+                "w-full h-full flex flex-col items-center justify-center text-center p-4 relative overflow-hidden outline-none",
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 fontFamily: currentTheme.styles.fontFamily,
                 color: 'var(--theme-block-text)',
@@ -46,7 +50,10 @@ export function HeaderBlock({ id, data }: HeaderBlockProps) {
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
+                    <div
+                        className="w-full h-full flex items-center justify-center text-slate-300"
+                        style={{ backgroundColor: currentTheme.colors.card === '#ffffff' ? '#f1f5f9' : 'rgba(255,255,255,0.1)' }}
+                    >
                         <User className="h-10 w-10" />
                     </div>
                 )}
@@ -64,9 +71,14 @@ export function HeaderBlock({ id, data }: HeaderBlockProps) {
                 </p>
             )}
 
+            {/* Highlight Glow Overlay */}
+            {data.highlight && (
+                <div className="absolute inset-0 bg-violet-500/5 pointer-events-none z-0 rounded-[inherit]" />
+            )}
+
             {!data.isActive && (
-                <div className="absolute top-2 right-2">
-                    <span className="bg-slate-900/10 text-slate-900 text-[10px] px-1.5 py-0.5 rounded-full font-medium">Hidden</span>
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
                 </div>
             )}
         </div>

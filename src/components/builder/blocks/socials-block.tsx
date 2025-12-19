@@ -26,7 +26,11 @@ export function SocialsBlock({ id, data }: SocialsBlockProps) {
 
     return (
         <div
-            className="w-full h-full p-4 flex flex-col justify-center relative overflow-hidden shadow-sm group border"
+            className={cn(
+                "w-full h-full p-4 flex flex-col justify-center relative overflow-hidden shadow-sm group border outline-none",
+                // @ts-ignore
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 background: 'var(--theme-block-bg)',
                 borderRadius: 'var(--theme-radius)',
@@ -34,9 +38,20 @@ export function SocialsBlock({ id, data }: SocialsBlockProps) {
             }}
         >
             {/* Visual Drag Handle */}
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div
+                className="absolute top-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ color: 'var(--theme-block-text)', opacity: 0.3 }}
+            >
                 <GripHorizontal className="h-3.5 w-3.5" />
             </div>
+
+            {/* Hidden Badge */}
+            {/* @ts-ignore */}
+            {!data.isActive && (
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
+                </div>
+            )}
 
             <div className="flex flex-wrap items-center justify-center gap-3">
                 {socialLinks.length === 0 && (
@@ -49,11 +64,13 @@ export function SocialsBlock({ id, data }: SocialsBlockProps) {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-50 text-slate-700 hover:scale-110 transition-transform duration-200 hover:bg-slate-100 hover:text-slate-900 border border-slate-200"
+                        className="flex items-center justify-center h-10 w-10 rounded-full hover:scale-110 transition-transform duration-200"
                         style={{
-                            // Use theme styling or clean minimalist? User asked for hover:scale-110, premium feel.
-                            // Let's stick to clean slate colors but possibly use primary color on hover?
-                            // For now, neutral is safe and premium.
+                            backgroundColor: currentTheme.type === 'modern' ? '#f8fafc' : 'rgba(255,255,255,0.1)',
+                            color: 'var(--theme-block-text)',
+                            borderColor: currentTheme.colors.border,
+                            borderWidth: currentTheme.styles.borderWidth,
+                            borderStyle: 'solid'
                         }}
                         onClick={(e) => e.preventDefault()} // Prevent nav in builder
                     >

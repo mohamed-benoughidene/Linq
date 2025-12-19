@@ -17,7 +17,11 @@ export function NewsletterBlock({ id, data }: NewsletterBlockProps) {
 
     return (
         <div
-            className="w-full h-full p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-sm border"
+            className={cn(
+                "w-full h-full p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-sm border outline-none",
+                // @ts-ignore
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 background: 'var(--theme-block-bg)',
                 borderRadius: 'var(--theme-radius)',
@@ -29,17 +33,31 @@ export function NewsletterBlock({ id, data }: NewsletterBlockProps) {
                 <GripHorizontal className="h-4 w-4" />
             </div>
 
+            {/* Hidden Badge */}
+            {/* @ts-ignore */}
+            {!data.isActive && (
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
+                </div>
+            )}
+
             <form
                 className="flex w-full gap-2 items-center mt-2"
                 onSubmit={(e) => e.preventDefault()}
             >
                 <div className="relative flex-1">
-                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4" style={{ color: 'var(--theme-block-text)', opacity: 0.5 }} />
                     <Input
                         type="email"
                         placeholder={placeholderText}
-                        className="pl-9 h-10 bg-slate-50 border-slate-200 focus-visible:ring-1 focus-visible:ring-slate-300"
-                        style={{ borderRadius: `calc(${currentTheme.styles.borderRadius} - 4px)` }}
+                        className="pl-9 h-10 focus-visible:ring-1"
+                        style={{
+                            borderRadius: `calc(${currentTheme.styles.borderRadius} - 4px)`,
+                            backgroundColor: currentTheme.type === 'modern' ? '#f8fafc' : 'transparent', // Light slate or transparent
+                            borderColor: currentTheme.colors.border,
+                            color: 'var(--theme-block-text)',
+                            borderWidth: currentTheme.styles.borderWidth,
+                        }}
                         readOnly // Prevent typing in builder
                     />
                 </div>

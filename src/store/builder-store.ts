@@ -37,7 +37,7 @@ export interface HistoryState {
 
 export interface BuilderBlock {
     id: string
-    type: 'link' | 'header' | 'video' | 'audio' | 'image' | 'newsletter' | 'gallery' | 'timer' | 'text' | 'map' | 'socials' | 'contact' | 'calendly' | 'embed'
+    type: 'link' | 'header' | 'video' | 'audio' | 'image' | 'newsletter' | 'gallery' | 'timer' | 'text' | 'map' | 'socials' | 'contact' | 'calendly' | 'embed' | 'commerce'
     content: {
         title: string
         description?: string // For bio or extra text
@@ -72,6 +72,11 @@ export interface BuilderBlock {
         calendlyUrl?: string
         // Embed specific
         embedUrl?: string
+        // Commerce specific
+        price?: string
+        currency?: string
+        image?: string
+        productUrl?: string // For external payment
     }
     layout: {
         i: string
@@ -113,7 +118,7 @@ export interface BuilderState {
 
     currentTheme: ThemePreset
     setTheme: (theme: ThemePreset) => void
-    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => void
+    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: string | number | boolean | null) => void
 
     pageSettings: PageSettings
     updatePageSettings: (settings: Partial<PageSettings>) => void
@@ -249,7 +254,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         set({ currentTheme: theme })
     },
 
-    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: any) => {
+    updateThemeProperty: (section: 'colors' | 'styles', key: string, value: string | number | boolean | null) => {
         set((state) => ({
             currentTheme: {
                 ...state.currentTheme,
@@ -265,7 +270,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         const id = uuidv4()
 
         // Define default layouts for different block types
-        let defaultW = 6
+        const defaultW = 6
         let defaultH = 1
 
         switch (type) {
@@ -308,6 +313,9 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
             case 'embed':
                 defaultH = 5
                 break
+            case 'commerce':
+                defaultH = 5 // Card shape
+                break
             default:
                 defaultH = 1
         }
@@ -327,17 +335,18 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
                                                 type === 'socials' ? 'Social Links' :
                                                     type === 'contact' ? 'Contact Me' :
                                                         type === 'calendly' ? 'Booking' :
-                                                            type === 'embed' ? 'Embed' : '',
+                                                            type === 'embed' ? 'Embed' :
+                                                                type === 'commerce' ? 'Digital Product' : '',
                 url: '',
                 isActive: true,
-                variant: type === 'gallery' ? 'wide' : type === 'calendly' || type === 'embed' ? 'hero' : 'classic',
+                variant: type === 'gallery' ? 'wide' : type === 'calendly' || type === 'embed' || type === 'commerce' ? 'hero' : 'classic',
                 galleryType: 'carousel',
                 images: [],
                 // Default content
                 targetDate: type === 'timer' ? new Date(Date.now() + 86400000).toISOString() : undefined,
                 timerLabel: type === 'timer' ? 'Launching in:' : undefined,
                 placeholderText: type === 'newsletter' ? 'email@example.com' : undefined,
-                buttonText: type === 'newsletter' ? 'Subscribe' : undefined,
+
                 textTitle: type === 'text' ? 'Welcome' : undefined,
                 textContent: type === 'text' ? 'Add clear and concise text here.' : undefined,
                 address: type === 'map' ? 'New York, NY' : undefined,
@@ -348,7 +357,13 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
                 contactEmail: type === 'contact' ? 'me@example.com' : undefined,
                 submitButtonText: type === 'contact' ? 'Send Message' : undefined,
                 calendlyUrl: type === 'calendly' ? '' : undefined,
-                embedUrl: type === 'embed' ? '' : undefined
+                embedUrl: type === 'embed' ? '' : undefined,
+                price: type === 'commerce' ? '10.00' : undefined,
+                currency: type === 'commerce' ? '$' : undefined,
+                image: type === 'commerce' ? '' : undefined,
+                productUrl: type === 'commerce' ? '' : undefined,
+                buttonText: type === 'commerce' ? 'Buy Now' : type === 'newsletter' ? 'Subscribe' : undefined,
+                description: type === 'commerce' ? 'Description of your product.' : type === 'header' ? undefined : undefined // Header handles description differently/optionally, but keeping generic description field useable
             },
             layout: {
                 i: id,

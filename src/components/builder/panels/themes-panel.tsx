@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useBuilderStore } from "@/store/builder-store"
 import { ThemeCard } from "@/components/builder/panels/theme-card"
 import { BackgroundPicker } from "@/components/builder/editors/background-picker"
+import { FontPicker } from "@/components/builder/panels/font-picker"
 import { THEMES } from "@/lib/themes"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
@@ -109,19 +110,10 @@ export function ThemesPanel() {
                             <h3 className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Typography</h3>
                             <div className="space-y-2">
                                 <Label className="text-xs">Font Pairing</Label>
-                                <Select
+                                <FontPicker
                                     value={currentTheme.styles.fontFamily}
-                                    onValueChange={(val: string) => updateThemeProperty('styles', 'fontFamily', val)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select font" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Inter, sans-serif">Inter (Modern)</SelectItem>
-                                        <SelectItem value="'Space Mono', monospace">Space Mono (Retro)</SelectItem>
-                                        <SelectItem value="'Times New Roman', serif">Serif (Classic)</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                    onChange={(val) => updateThemeProperty('styles', 'fontFamily', val)}
+                                />
                             </div>
 
                         </div>

@@ -15,6 +15,8 @@ import { SocialsBlock } from "./blocks/socials-block"
 import { ContactBlock } from "./blocks/contact-block"
 import { CalendlyBlock } from "./blocks/calendly-block"
 import { EmbedBlock } from "./blocks/embed-block"
+import { CommerceBlock } from "./blocks/commerce-block"
+import { CommerceForm } from "./forms/commerce-form"
 import { SizeSelector, BlockVariant } from "./editors/size-selector"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -75,6 +77,8 @@ export function BlockRenderer({ block }: { block: BuilderBlock }) {
                 return <CalendlyBlock id={id} data={content} />
             case 'embed':
                 return <EmbedBlock id={id} data={content} />
+            case 'commerce':
+                return <CommerceBlock id={id} data={content} />
             default:
                 return <div className="p-4 text-red-500 bg-red-50 rounded-lg">Unknown Block Type</div>
         }
@@ -97,6 +101,14 @@ export function BlockRenderer({ block }: { block: BuilderBlock }) {
             case 'wide': w = 4; h = 2; break;     // 4x2
             case 'hero': w = 6; h = 5; break;     // 6x5
         }
+
+        // Special override for Commerce if needed, but 'hero' default covers it.
+        // Actually, commerce-form.tsx handles its own layout updates now,
+        // so this handleSizeChange might be bypassed if CommerceForm uses its own logic.
+        // But since we are rendering CommerceForm in the renderEditorFields,
+        // we should make sure CommerceForm is used correctly. 
+        // Note: CommerceForm implementation created earlier duplicated this logic.
+        // It's fine for now.
 
         updateBlock(id, { variant: newVariant })
 
@@ -548,6 +560,8 @@ export function BlockRenderer({ block }: { block: BuilderBlock }) {
                         </div>
                     </div>
                 )
+            case 'commerce':
+                return <CommerceForm id={id} data={content} />
             default:
                 return null
         }

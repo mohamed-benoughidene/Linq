@@ -16,7 +16,8 @@ import {
     Share2,
     MessageSquare,
     CalendarClock,
-    Globe
+    Globe,
+    ShoppingBag
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,6 +35,7 @@ const BLOCK_TYPES = [
     { type: 'audio', label: 'Audio', icon: Music, category: 'Media' },
     { type: 'newsletter', label: 'Newsletter', icon: Mail, category: 'Growth' },
     { type: 'contact', label: 'Contact', icon: MessageSquare, category: 'Growth' },
+    { type: 'commerce', label: 'Product', icon: ShoppingBag, category: 'Growth' },
     { type: 'calendly', label: 'Calendly', icon: CalendarClock, category: 'Growth' },
     { type: 'map', label: 'Map', icon: MapPin, category: 'Utility' },
     { type: 'timer', label: 'Timer', icon: Clock, category: 'Utility' },

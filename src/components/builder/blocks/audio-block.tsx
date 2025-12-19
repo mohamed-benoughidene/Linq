@@ -8,6 +8,7 @@ interface AudioBlockProps {
     data: {
         embedUrl?: string
         isActive: boolean
+        highlight?: boolean
     }
 }
 
@@ -37,8 +38,14 @@ export function AudioBlock({ id, data }: AudioBlockProps) {
     if (!embedSrc) {
         return (
             <div
-                className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-lg"
-                style={{ borderRadius: currentTheme.styles.borderRadius }}
+                className="w-full h-full flex items-center justify-center text-sm font-medium border-2 border-dashed"
+                style={{
+                    borderRadius: currentTheme.styles.borderRadius,
+                    borderColor: currentTheme.colors.border,
+                    background: 'var(--theme-block-bg)',
+                    color: 'var(--theme-block-text)',
+                    opacity: 0.5
+                }}
             >
                 Enter a Spotify or SoundCloud URL
             </div>
@@ -47,10 +54,14 @@ export function AudioBlock({ id, data }: AudioBlockProps) {
 
     return (
         <div
-            className="w-full h-full overflow-hidden bg-slate-50 relative rounded-lg border border-transparent"
+            className={cn(
+                "w-full h-full overflow-hidden relative rounded-lg border border-transparent outline-none",
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 borderRadius: 'var(--theme-radius)',
                 borderColor: currentTheme.colors.border,
+                background: 'var(--theme-block-bg)'
             }}
         >
             <iframe
@@ -59,9 +70,10 @@ export function AudioBlock({ id, data }: AudioBlockProps) {
                 allow="encrypted-media"
                 loading="lazy"
             />
+            {/* Hidden Badge */}
             {!data.isActive && (
-                <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
-                    <span className="bg-slate-900/80 text-white text-xs px-2 py-1 rounded">Hidden</span>
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
                 </div>
             )}
         </div>

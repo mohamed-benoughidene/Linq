@@ -5,6 +5,7 @@ import { Responsive, WidthProvider, Layout } from "react-grid-layout"
 import debounce from "lodash.debounce"
 import { useBuilderStore } from "@/store/builder-store"
 import { BlockRenderer } from "./block-renderer"
+import { FontLoader } from "./font-loader"
 import { Button } from "@/components/ui/button"
 import {
     Plus,
@@ -158,6 +159,7 @@ export function BuilderCanvas() {
                     </ResponsiveGridLayout>
                 </div>
             )}
+            <FontLoader />
         </div>
     )
 }

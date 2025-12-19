@@ -14,6 +14,7 @@ interface GalleryBlockProps {
         galleryType?: 'carousel' | 'accordion' | 'creative' | 'stack'
         images?: { id: string; url: string; alt?: string }[]
         isActive: boolean
+        highlight?: boolean
     }
 }
 
@@ -25,11 +26,13 @@ export function GalleryBlock({ id, data }: GalleryBlockProps) {
     if (!images || images.length === 0) {
         return (
             <div
-                className="w-full h-full min-h-[120px] flex flex-col items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed p-4 gap-2"
+                className="w-full h-full min-h-[120px] flex flex-col items-center justify-center text-sm font-medium border-2 border-dashed p-4 gap-2"
                 style={{
                     background: 'var(--theme-block-bg)',
                     borderRadius: 'var(--theme-radius)',
-                    borderColor: currentTheme.colors.border
+                    borderColor: currentTheme.colors.border,
+                    color: 'var(--theme-block-text)',
+                    opacity: 0.5
                 }}
             >
                 <ImageIcon className="h-6 w-6 opacity-50" />
@@ -58,7 +61,10 @@ export function GalleryBlock({ id, data }: GalleryBlockProps) {
 
     return (
         <div
-            className="w-full h-full overflow-hidden relative border border-transparent"
+            className={cn(
+                "w-full h-full overflow-hidden relative border border-transparent outline-none",
+                data.highlight && "ring-2 ring-violet-500 ring-offset-2 animate-pulse"
+            )}
             style={{
                 background: 'var(--theme-block-bg)',
                 borderRadius: currentTheme.styles.borderRadius,
@@ -66,6 +72,13 @@ export function GalleryBlock({ id, data }: GalleryBlockProps) {
             }}
         >
             {renderContent()}
+
+            {/* Hidden Badge */}
+            {!data.isActive && (
+                <div className="absolute top-2 left-2 z-20 pointer-events-none">
+                    <span className="bg-slate-100/80 backdrop-blur-sm text-slate-500 border border-slate-200 text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-sm">Hidden</span>
+                </div>
+            )}
         </div>
     )
 }
